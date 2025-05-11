@@ -35,10 +35,19 @@ export const IdentifyClass = () => {
   const [activeTab, setActiveTab] = useState<'rules' | 'model'>('rules');
 
   const handleValueChange = (propertyName: string, value: string | number) => {
-    setSelectedValues(prev => ({
-      ...prev,
-      [propertyName]: value
-    }));
+    if (value === '') {
+      // Удаляем свойство из состояния, если выбрано пустое значение
+      setSelectedValues(prev => {
+        const newValues = {...prev};
+        delete newValues[propertyName];
+        return newValues;
+      });
+    } else {
+      setSelectedValues(prev => ({
+        ...prev,
+        [propertyName]: value
+      }));
+    }
     setResult(null);
   };
 
@@ -54,7 +63,7 @@ export const IdentifyClass = () => {
     e.preventDefault();
     
     const selectedProperties: SelectedProperty[] = Object.entries(selectedValues)
-      .filter(([_, value]) => value !== undefined)
+      .filter(([_, value]) => value !== undefined && value !== '')
       .map(([name, value]) => ({ name, value }));
 
     if (selectedProperties.length === 0) {
@@ -76,7 +85,7 @@ export const IdentifyClass = () => {
       { name: 'цвет', value: modelValues.color },
       { name: 'размер', value: modelValues.size },
       { name: 'жилкование', value: modelValues.venation }
-    ].filter(item => item.value);
+    ].filter(item => item.value !== '');
 
     if (selectedProperties.length === 0) {
       alert('Заполните хотя бы одно поле');
@@ -151,7 +160,7 @@ export const IdentifyClass = () => {
                       type="number"
                       className="form-control form-control-lg border-success"
                       value={selectedValues[property.name] || ''}
-                      onChange={(e) => handleValueChange(property.name, Number(e.target.value))}
+                      onChange={(e) => handleValueChange(property.name, e.target.value === '' ? '' : Number(e.target.value))}
                       placeholder={`Введите значение для ${property.name}`}
                     />
                   ) : (
@@ -175,13 +184,13 @@ export const IdentifyClass = () => {
                 <h5 className="mb-3">Выбранные значения:</h5>
                 <div className="list-group">
                   {Object.entries(selectedValues)
-                    .filter(([_, value]) => value !== '')
+                    .filter(([_, value]) => value !== '' && value !== undefined)
                     .map(([name, value]) => (
                       <div key={name} className="list-group-item d-flex justify-content-between align-items-center">
                         <span><strong>{name}</strong>: {value}</span>
                       </div>
                     ))}
-                  {Object.values(selectedValues).filter(v => v !== '').length === 0 && (
+                  {Object.values(selectedValues).filter(v => v !== '' && v !== undefined).length === 0 && (
                     <div className="list-group-item">Не выбрано ни одного свойства</div>
                   )}
                 </div>
@@ -190,7 +199,7 @@ export const IdentifyClass = () => {
               <button
                 type="submit"
                 className="btn btn-success btn-lg mt-4"
-                disabled={isIdentifying || Object.values(selectedValues).filter(v => v !== '').length === 0}
+                disabled={isIdentifying || Object.values(selectedValues).filter(v => v !== '' && v !== undefined).length === 0}
               >
                 {isIdentifying ? (
                   <>
@@ -237,8 +246,13 @@ export const IdentifyClass = () => {
 
               <div className="mb-4">
                 <label className="form-label"><strong>Размер листа (см)</strong></label>
-                <input type="number" value={modelValues.size}  onChange={(e) => handleModelValueChange('size', e.target.value)}/>
-
+                <input 
+                  type="number" 
+                  className="form-control border-success"
+                  value={modelValues.size}  
+                  onChange={(e) => handleModelValueChange('size', e.target.value)}
+                  placeholder="Введите размер"
+                />
               </div>
 
               <div className="mb-4">
