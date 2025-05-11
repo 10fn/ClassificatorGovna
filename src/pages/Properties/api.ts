@@ -1,6 +1,11 @@
 import axios from 'axios';
 import { queryClient } from '../../queryClient';
 
+interface Property {
+  name: string;
+  type: 'numeric' | 'enum';
+}
+
 const propertiesApi = {
   // Получение списка свойств
   getProperties: async (): Promise<string[]> => {
@@ -9,8 +14,8 @@ const propertiesApi = {
   },
 
   // Создание нового свойства
-  addProperty: (name: string): Promise<void> => {
-    return axios.post('http://localhost:5000/props', { name });
+  addProperty: (data: Property): Promise<void> => {
+    return axios.post('http://localhost:5000/props', data);
   },
 
   // Удаление свойства
@@ -19,44 +24,23 @@ const propertiesApi = {
   }
 };
 
-// // Моковая реализация для разработки
-// const mockPropertiesApi = {
-//   getProperties: async (): Promise<string[]> => {
-//     return ['Цвет', 'Высота', 'Диаметр ствола', 'Продолжительность жизни'];
-//   },
-  
-//   addProperty: async (name: string): Promise<void> => {
-//     console.log(`Mock: Added property ${name}`);
-//     await new Promise(resolve => setTimeout(resolve, 500));
-//   },
-  
-//   deleteProperty: async (name: string): Promise<void> => {
-//     console.log(`Mock: Deleted property ${name}`);
-//     await new Promise(resolve => setTimeout(resolve, 500));
-//   }
-// };
-
-// Выберите нужную реализацию (реальную или моковую)
-const api = propertiesApi;
-// const api = mockPropertiesApi; // Для разработки без бэкенда
-
 export const usePropertiesQuery = () => ({
   queryKey: ['properties'],
   queryFn: async () => {
-    const data = await api.getProperties();
+    const data = await propertiesApi.getProperties();
     return Array.isArray(data) ? data : [];
   },
 });
 
 export const addPropertyMutation = {
-  fn: (name: string) => api.addProperty(name),
+  fn: (data: Property) => propertiesApi.addProperty(data),
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['properties'] });
   },
 };
 
 export const deletePropertyMutation = {
-  fn: (name: string) => api.deleteProperty(name),
+  fn: (name: string) => propertiesApi.deleteProperty(name),
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['properties'] });
   },

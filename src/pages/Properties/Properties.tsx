@@ -6,13 +6,16 @@ import {
   deletePropertyMutation 
 } from './api';
 
+type PropertyType = 'numeric' | 'enum';
+
 export const Properties = () => {
   const [newPropertyName, setNewPropertyName] = useState('');
+  const [newPropertyType, setNewPropertyType] = useState<PropertyType>('enum');
   
   const { data: properties } = useQuery(usePropertiesQuery());
 
   const { mutate: addProperty, isPending: isAdding } = useMutation({
-    mutationFn: addPropertyMutation.fn,
+    mutationFn: (name: string) => addPropertyMutation.fn({ name, type: newPropertyType }),
     onSuccess: () => {
       addPropertyMutation.onSuccess();
       setNewPropertyName('');
@@ -49,6 +52,14 @@ export const Properties = () => {
               value={newPropertyName}
               onChange={(e) => setNewPropertyName(e.target.value)}
             />
+            <select
+              className="form-select form-select-lg border-success"
+              value={newPropertyType}
+              onChange={(e) => setNewPropertyType(e.target.value as PropertyType)}
+            >
+              <option value="enum">Перечислимое</option>
+              <option value="numeric">Числовое</option>
+            </select>
             <button
               className="btn btn-success btn-lg"
               onClick={handleAddProperty}
