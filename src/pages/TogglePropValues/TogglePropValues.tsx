@@ -114,18 +114,18 @@ export const TogglePropValues = () => {
   };
 
   return (
-    <div className="container my-4">
-      <div className="card border-success shadow">
-        <div className="card-header bg-success text-white">
+    <div className="container my-4" style={{ backgroundColor: '#f5f5f5', padding: '30px', borderRadius: '10px' }}>
+      <div className="card border-danger shadow">
+        <div className="card-header bg-danger text-white">
           <h2 className="h5 mb-0">Управление значениями свойств</h2>
         </div>
         
         <div className="card-body">
           <div className="row">
             <div className="col-md-4 mb-3">
-              <label className="form-label">Выберите класс</label>
+              <label className="form-label text-danger">Выберите класс</label>
               <select 
-                className="form-select border-success"
+                className="form-select border-danger"
                 value={selectedClass}
                 onChange={(e) => handleClassChange(e.target.value)}
               >
@@ -138,12 +138,12 @@ export const TogglePropValues = () => {
 
             {selectedClass && (
               <div className="col-md-4 mb-3">
-                <label className="form-label">Выберите свойство</label>
+                <label className="form-label text-danger">Выберите свойство</label>
                 <div className="list-group">
                   {classProps.map((prop) => (
                     <button
                       key={prop.name}
-                      className={`list-group-item list-group-item-action ${selectedProp?.name === prop.name ? 'active bg-success border-success' : ''}`}
+                      className={`list-group-item list-group-item-action ${selectedProp?.name === prop.name ? 'active bg-danger border-danger' : ''}`}
                       onClick={() => handlePropSelect(prop)}
                     >
                       {prop.name} ({prop.type})
@@ -156,10 +156,10 @@ export const TogglePropValues = () => {
 
           {selectedProp && (
             <div className="mt-4">
-              <h5 className="text-success">Значения свойства: {selectedProp.name}</h5>
+              <h5 className="text-danger">Значения свойства: {selectedProp.name}</h5>
               
               {selectedProp.type === 'numeric' ? (
-                <div className="card p-3 mb-3">
+                <div className="card p-3 mb-3" style={{ backgroundColor: '#ffe6e6' }}>
                   <div className="row g-3">
                     <div className="col-md-5">
                       <label className="form-label">От</label>
@@ -185,7 +185,7 @@ export const TogglePropValues = () => {
                     </div>
                     <div className="col-md-2 d-flex align-items-end">
                       <button
-                        className="btn btn-success"
+                        className="btn btn-danger"
                         onClick={handleNumericRangeSubmit}
                       >
                         Применить
@@ -214,7 +214,7 @@ export const TogglePropValues = () => {
                             checked={currentState === 'on'}
                             onChange={() => handleValueToggle(value.name, currentState)}
                           />
-                          <label className="form-check-label" htmlFor={`value-${value.name}`}>
+                          <label className="form-check-label text-danger" htmlFor={`value-${value.name}`}>
                             {value.name}
                           </label>
                         </div>

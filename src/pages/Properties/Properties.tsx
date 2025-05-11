@@ -38,54 +38,52 @@ export const Properties = () => {
 
   return (
     <div className="container my-4">
-      <div className="card border-success shadow">
-        <div className="card-header bg-success text-white">
-          <h2 className="h5 mb-0">Список свойств растений</h2>
+      <div className="card shadow-lg" style={{ border: '2px solid #e74c3c', backgroundColor: '#f9f9f9' }}>
+        <div className="card-header" style={{ backgroundColor: '#e74c3c', color: '#fff' }}>
+          <h2 className="h4 mb-0">Список свойств растений</h2>
         </div>
         
         <div className="card-body">
-          <div className="d-flex gap-2 mb-3">
-            <input
-              type="text"
-              className="form-control form-control-lg border-success"
-              placeholder="Введите название свойства"
-              value={newPropertyName}
-              onChange={(e) => setNewPropertyName(e.target.value)}
-            />
-            <select
-              className="form-select form-select-lg border-success"
-              value={newPropertyType}
-              onChange={(e) => setNewPropertyType(e.target.value as PropertyType)}
-            >
-              <option value="enum">Перечислимое</option>
-              <option value="numeric">Числовое</option>
-            </select>
+          <div className="d-flex gap-3 flex-column mb-4">
+            <div className="d-flex gap-2">
+              <input
+                type="text"
+                className="form-control form-control-lg border-danger"
+                placeholder="Введите название свойства"
+                value={newPropertyName}
+                onChange={(e) => setNewPropertyName(e.target.value)}
+              />
+              <select
+                className="form-select form-select-lg border-danger"
+                value={newPropertyType}
+                onChange={(e) => setNewPropertyType(e.target.value as PropertyType)}
+              >
+                <option value="enum">Перечислимое</option>
+                <option value="numeric">Числовое</option>
+              </select>
+            </div>
             <button
-              className="btn btn-success btn-lg"
+              className="btn btn-danger btn-lg"
               onClick={handleAddProperty}
               disabled={isAdding || !newPropertyName.trim()}
+              style={{ alignSelf: 'center' }}
             >
               {isAdding ? (
-                <>
-                  <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                  Добавление...
-                </>
+                <span className="spinner-border spinner-border-sm me-2" role="status"></span>
               ) : (
-                <>
-                  <i className="bi bi-plus-circle me-2"></i>
-                  Добавить
-                </>
+                <i className="bi bi-plus-circle me-2"></i>
               )}
+              {isAdding ? 'Добавление...' : 'Добавить'}
             </button>
           </div>
 
           {properties && properties.length > 0 ? (
             <div className="list-group">
               {properties.map((property) => (
-                <div key={property} className="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                  <span className="fw-bold text-success">{property}</span>
+                <div key={property} className="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style={{ border: '2px solid #e74c3c' }}>
+                  <span className="fw-bold text-danger">{property}</span>
                   <button
-                    className="btn btn-outline-success btn-sm"
+                    className="btn btn-outline-danger btn-sm"
                     onClick={() => handleDeleteProperty(property)}
                     disabled={isDeleting}
                   >
@@ -99,7 +97,7 @@ export const Properties = () => {
               ))}
             </div>
           ) : (
-            <div className="alert alert-success">
+            <div className="alert alert-danger">
               <i className="bi bi-info-circle me-2"></i>
               Нет свойств в списке. Добавьте первое свойство.
             </div>

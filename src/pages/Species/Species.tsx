@@ -34,8 +34,8 @@ export const Species = () => {
 
   return (
     <div className="container my-4">
-      <div className="card border-success shadow">
-        <div className="card-header bg-success text-white">
+      <div className="card border-danger shadow-lg">
+        <div className="card-header bg-danger text-white">
           <h2 className="h5 mb-0">Список видов растений</h2>
         </div>
         
@@ -43,13 +43,13 @@ export const Species = () => {
           <div className="d-flex gap-2 mb-3">
             <input
               type="text"
-              className="form-control form-control-lg border-success"
+              className="form-control form-control-lg border-danger"
               placeholder="Введите название растения"
               value={newPlantName}
               onChange={(e) => setNewPlantName(e.target.value)}
             />
             <button
-              className="btn btn-success btn-lg"
+              className="btn btn-danger btn-lg"
               onClick={handleAddPlant}
               disabled={isAdding || !newPlantName.trim()}
             >
@@ -71,9 +71,9 @@ export const Species = () => {
             <div className="list-group">
               {plants.map((plant) => (
                 <div key={plant} className="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                  <span className="fw-bold text-success">{plant}</span>
+                  <span className="fw-bold text-danger">{plant}</span>
                   <button
-                    className="btn btn-outline-success btn-sm"
+                    className="btn btn-outline-danger btn-sm"
                     onClick={() => handleDeletePlant(plant)}
                     disabled={isDeleting}
                   >
@@ -87,7 +87,7 @@ export const Species = () => {
               ))}
             </div>
           ) : (
-            <div className="alert alert-success">
+            <div className="alert alert-danger">
               <i className="bi bi-info-circle me-2"></i>
               Нет растений в списке. Добавьте первое растение.
             </div>

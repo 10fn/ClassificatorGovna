@@ -36,8 +36,8 @@ export const ToggleClassProps = () => {
 
   return (
     <div className="container my-4">
-      <div className="card border-success shadow">
-        <div className="card-header bg-success text-white">
+      <div className="card border-danger shadow-lg">
+        <div className="card-header bg-danger text-white">
           <h2 className="h5 mb-0">Управление свойствами классов</h2>
         </div>
         
@@ -58,7 +58,7 @@ export const ToggleClassProps = () => {
 
           {selectedClass && (
             <div className="mb-3">
-              <h5 className="mb-3">Свойства класса {selectedClass}</h5>
+              <h5 className="mb-3 text-danger">Свойства класса {selectedClass}</h5>
               <div className="list-group">
                 {classProps.map(prop => (
                   <div key={prop.name} className="list-group-item">

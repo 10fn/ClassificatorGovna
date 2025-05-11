@@ -9,7 +9,7 @@ export const CompletenessCheck = () => {
     return (
       <div className="container my-4">
         <div className="text-center">
-          <div className="spinner-border text-success" role="status">
+          <div className="spinner-border text-danger" role="status">
             <span className="visually-hidden">Загрузка...</span>
           </div>
           <p>Проверка полноты данных...</p>
@@ -30,11 +30,11 @@ export const CompletenessCheck = () => {
 
   return (
     <div className="container my-4">
-      <div className="card border-success shadow">
-        <div className="card-header bg-success text-white">
+      <div className="card border-danger shadow">
+        <div className="card-header bg-danger text-white">
           <h2 className="h5 mb-0">Проверка полноты знаний</h2>
         </div>
-        
+
         <div className="card-body">
           {data?.isError ? (
             <>
@@ -51,7 +51,7 @@ export const CompletenessCheck = () => {
                     <ul className="mb-0">
                       {missingProps.map(prop => (
                         <li key={`${className}-${prop}`}>
-                          <Link 
+                          <Link
                             to={`/property-values?class=${encodeURIComponent(className)}&prop=${encodeURIComponent(prop)}`}
                             className="text-danger"
                           >
@@ -75,7 +75,7 @@ export const CompletenessCheck = () => {
             <h5 className="mb-3">Все свойства системы:</h5>
             <div className="d-flex flex-wrap gap-2">
               {data?.props.map(prop => (
-                <span key={prop} className="badge bg-success">
+                <span key={prop} className="badge bg-danger">
                   {prop}
                 </span>
               ))}

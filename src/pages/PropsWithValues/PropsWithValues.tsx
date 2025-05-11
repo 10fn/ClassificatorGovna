@@ -2,18 +2,17 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { 
   usePropsWithValuesQuery,
-	useDeleteValue,
-	useAddValue
+  useDeleteValue,
+  useAddValue
 } from './api';
 
 export const PropsWithValues = () => {
-	const [selectedProp, setSelectedProp] = useState<string>('');
+  const [selectedProp, setSelectedProp] = useState<string>('');
   const [newValue, setNewValue] = useState<string>('');
   
   const { data: properties = [] } = useQuery(usePropsWithValuesQuery());
   const { mutate: deleteValue } = useDeleteValue();
   const { mutate: addValue } = useAddValue();
-
 
   const currentProp = properties.find(p => p.name === selectedProp);
   const values = currentProp?.values || [];
@@ -35,17 +34,17 @@ export const PropsWithValues = () => {
 
   return (
     <div className="container my-4">
-      <div className="card border-success shadow">
-        <div className="card-header bg-success text-white">
+      <div className="card border-danger shadow-lg">
+        <div className="card-header bg-danger text-white">
           <h2 className="h5 mb-0">Значения свойств растений</h2>
         </div>
         
         <div className="card-body">
           {/* Селектор свойства */}
           <div className="mb-4">
-            <label className="form-label">Выберите свойство</label>
+            <label className="form-label text-danger">Выберите свойство</label>
             <select 
-              className="form-select"
+              className="form-select border-danger"
               value={selectedProp}
               onChange={(e) => setSelectedProp(e.target.value)}
             >
@@ -63,13 +62,13 @@ export const PropsWithValues = () => {
             <div className="d-flex gap-2 mb-3">
               <input
                 type={currentProp?.type === 'numeric' ? 'number' : 'text'}
-                className="form-control"
+                className="form-control border-danger"
                 placeholder={`Введите ${currentProp?.type === 'numeric' ? 'числовое' : 'текстовое'} значение`}
                 value={newValue}
                 onChange={(e) => setNewValue(e.target.value)}
               />
               <button
-                className="btn btn-success"
+                className="btn btn-danger"
                 onClick={handleAddValue}
                 disabled={!newValue.trim()}
               >

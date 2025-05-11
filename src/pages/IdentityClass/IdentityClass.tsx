@@ -124,13 +124,13 @@ export const IdentifyClass = () => {
 
   return (
     <div className="container my-4">
-      <div className="card border-success shadow">
-        <div className="card-header bg-success text-white">
+      <div className="card border-danger shadow-lg">
+        <div className="card-header bg-danger text-white">
           <h2 className="h5 mb-0">Идентификация класса растения</h2>
         </div>
-        
+  
         <div className="card-body">
-          <ul className="nav nav-tabs mb-4">
+          <ul className="nav nav-pills mb-4">
             <li className="nav-item">
               <button 
                 className={`nav-link ${activeTab === 'rules' ? 'active' : ''}`}
@@ -148,24 +148,24 @@ export const IdentifyClass = () => {
               </button>
             </li>
           </ul>
-
+  
           {activeTab === 'rules' ? (
             <form onSubmit={handleRulesSubmit}>
               {properties.map((property: PropertyWithValues) => (
                 <div key={property.name} className="mb-4">
-                  <label className="form-label"><strong>{property.name}</strong></label>
-                  
+                  <label className="form-label text-danger"><strong>{property.name}</strong></label>
+  
                   {property.type === 'numeric' ? (
                     <input
                       type="number"
-                      className="form-control form-control-lg border-success"
+                      className="form-control form-control-lg border-danger"
                       value={selectedValues[property.name] || ''}
                       onChange={(e) => handleValueChange(property.name, e.target.value === '' ? '' : Number(e.target.value))}
                       placeholder={`Введите значение для ${property.name}`}
                     />
                   ) : (
                     <select
-                      className="form-select border-success"
+                      className="form-select border-danger"
                       value={selectedValues[property.name] || ''}
                       onChange={(e) => handleValueChange(property.name, e.target.value)}
                     >
@@ -179,9 +179,9 @@ export const IdentifyClass = () => {
                   )}
                 </div>
               ))}
-
+  
               <div className="mt-4">
-                <h5 className="mb-3">Выбранные значения:</h5>
+                <h5 className="mb-3 text-danger">Выбранные значения:</h5>
                 <div className="list-group">
                   {Object.entries(selectedValues)
                     .filter(([_, value]) => value !== '' && value !== undefined)
@@ -191,14 +191,14 @@ export const IdentifyClass = () => {
                       </div>
                     ))}
                   {Object.values(selectedValues).filter(v => v !== '' && v !== undefined).length === 0 && (
-                    <div className="list-group-item">Не выбрано ни одного свойства</div>
+                    <div className="list-group-item text-danger">Не выбрано ни одного свойства</div>
                   )}
                 </div>
               </div>
-
+  
               <button
                 type="submit"
-                className="btn btn-success btn-lg mt-4"
+                className="btn btn-danger btn-lg mt-4"
                 disabled={isIdentifying || Object.values(selectedValues).filter(v => v !== '' && v !== undefined).length === 0}
               >
                 {isIdentifying ? (
@@ -217,9 +217,9 @@ export const IdentifyClass = () => {
           ) : (
             <form onSubmit={handleModelSubmit}>
               <div className="mb-4">
-                <label className="form-label"><strong>Форма листа</strong></label>
+                <label className="form-label text-danger"><strong>Форма листа</strong></label>
                 <select
-                  className="form-select border-success"
+                  className="form-select border-danger"
                   value={modelValues.form}
                   onChange={(e) => handleModelValueChange('form', e.target.value)}
                 >
@@ -229,11 +229,11 @@ export const IdentifyClass = () => {
                   <option value="Сердцевидная">Сердцевидная</option>
                 </select>
               </div>
-
+  
               <div className="mb-4">
-                <label className="form-label"><strong>Цвет листа</strong></label>
+                <label className="form-label text-danger"><strong>Цвет листа</strong></label>
                 <select
-                  className="form-select border-success"
+                  className="form-select border-danger"
                   value={modelValues.color}
                   onChange={(e) => handleModelValueChange('color', e.target.value)}
                 >
@@ -243,22 +243,22 @@ export const IdentifyClass = () => {
                   <option value="Желтый">Желтый</option>
                 </select>
               </div>
-
+  
               <div className="mb-4">
-                <label className="form-label"><strong>Размер листа (см)</strong></label>
+                <label className="form-label text-danger"><strong>Размер листа (см)</strong></label>
                 <input 
                   type="number" 
-                  className="form-control border-success"
+                  className="form-control border-danger"
                   value={modelValues.size}  
                   onChange={(e) => handleModelValueChange('size', e.target.value)}
                   placeholder="Введите размер"
                 />
               </div>
-
+  
               <div className="mb-4">
-                <label className="form-label"><strong>Тип жилкования</strong></label>
+                <label className="form-label text-danger"><strong>Тип жилкования</strong></label>
                 <select
-                  className="form-select border-success"
+                  className="form-select border-danger"
                   value={modelValues.venation}
                   onChange={(e) => handleModelValueChange('venation', e.target.value)}
                 >
@@ -268,9 +268,9 @@ export const IdentifyClass = () => {
                   <option value="Дуговидное">Дуговидное</option>
                 </select>
               </div>
-
+  
               <div className="mt-4">
-                <h5 className="mb-3">Выбранные значения:</h5>
+                <h5 className="mb-3 text-danger">Выбранные значения:</h5>
                 <div className="list-group">
                   {Object.entries(modelValues)
                     .filter(([_, value]) => value !== '')
@@ -280,14 +280,14 @@ export const IdentifyClass = () => {
                       </div>
                     ))}
                   {Object.values(modelValues).filter(v => v !== '').length === 0 && (
-                    <div className="list-group-item">Не заполнено ни одного поля</div>
+                    <div className="list-group-item text-danger">Не заполнено ни одного поля</div>
                   )}
                 </div>
               </div>
-
+  
               <button
                 type="submit"
-                className="btn btn-success btn-lg mt-4"
+                className="btn btn-danger btn-lg mt-4"
                 disabled={isPredicting || Object.values(modelValues).filter(v => v !== '').length === 0}
               >
                 {isPredicting ? (
@@ -304,9 +304,9 @@ export const IdentifyClass = () => {
               </button>
             </form>
           )}
-
+  
           {result && (
-            <div className="alert alert-success mt-4">
+            <div className="alert alert-danger mt-4">
               <i className="bi bi-check-circle-fill me-2"></i>
               <strong>Результат идентификации:</strong> {result.join(', ')}
             </div>
@@ -315,4 +315,5 @@ export const IdentifyClass = () => {
       </div>
     </div>
   );
+  
 };
