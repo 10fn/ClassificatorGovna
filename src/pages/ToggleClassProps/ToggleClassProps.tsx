@@ -70,10 +70,10 @@ export const ToggleClassProps = () => {
               <div className="d-flex justify-content-between align-items-center">
                 <h2 className="h4 mb-0">
                   <i className="bi bi-gear-wide-connected me-2"></i>
-                  Управление свойствами классов
+                  Управление свойствами жанров
                 </h2>
                 <span className="badge bg-light text-primary rounded-pill">
-                  {classes.length} классов
+                  {classes.length} жанров
                 </span>
               </div>
             </div>
@@ -86,7 +86,7 @@ export const ToggleClassProps = () => {
                     <div className="card-header bg-blue-10 py-2">
                       <h5 className="mb-0 text-primary">
                         <i className="bi bi-funnel me-2"></i>
-                        Выбор класса музыки
+                        Выбор жанра музыки
                       </h5>
                     </div>
                     <div className="card-body">
@@ -97,13 +97,14 @@ export const ToggleClassProps = () => {
                           placeholder="Поиск по названию класса..."
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
+													hidden
                         />
                         <select 
                           className="form-select border-primary border-opacity-50"
                           value={selectedClass}
                           onChange={(e) => setSelectedClass(e.target.value)}
                         >
-                          <option value="">-- Выберите класс --</option>
+                          <option value="">-- Выберите жанр --</option>
                           {filteredClasses.map(cls => (
                             <option key={cls.name} value={cls.name}>
                               {cls.name}
@@ -177,7 +178,7 @@ export const ToggleClassProps = () => {
                   <div className="col-md-12">
                     <div className="alert alert-warning">
                       <i className="bi bi-exclamation-triangle me-2"></i>
-                      Пожалуйста, выберите класс для управления его свойствами
+                      Пожалуйста, выберите жанр для управления его свойствами
                     </div>
                   </div>
                 )}

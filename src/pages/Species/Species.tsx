@@ -79,10 +79,10 @@ export const Species = () => {
               <div className="d-flex justify-content-between align-items-center">
                 <h2 className="h4 mb-0">
                   <i className="bi bi-flower2 me-2"></i>
-                  Каталог видов музыки
+                  Каталог жанров музыки
                 </h2>
                 <span className="badge bg-light text-primary rounded-pill">
-                  {plants.length} видов
+                  {plants.length} жанров
                 </span>
               </div>
             </div>
@@ -95,7 +95,7 @@ export const Species = () => {
                     <div className="card-header bg-blue-10 py-2">
                       <h5 className="mb-0 text-primary">
                         <i className="bi bi-plus-circle me-2"></i>
-                        Добавить новый вид
+                        Добавить новый жанр
                       </h5>
                     </div>
                     <div className="card-body">
@@ -104,7 +104,7 @@ export const Species = () => {
                           <input
                             type="text"
                             className="form-control border-primary border-opacity-50"
-                            placeholder="Например: Роза обыкновенная"
+                            placeholder="Например: Кантри"
                             value={newPlantName}
                             onChange={(e) => setNewPlantName(e.target.value)}
                           />
@@ -132,7 +132,7 @@ export const Species = () => {
                 </div>
 
                 {/* Панель поиска */}
-                <div className="col-md-12">
+                <div className="col-md-12" hidden>
                   <div className="card border-primary border-opacity-25">
                     <div className="card-header bg-blue-10 py-2">
                       <h5 className="mb-0 text-primary">
@@ -158,7 +158,7 @@ export const Species = () => {
                     <div className="card-header bg-blue-10 py-2 d-flex justify-content-between align-items-center">
                       <h5 className="mb-0 text-primary">
                         <i className="bi bi-list-ul me-2"></i>
-                        Зарегистрированные виды
+                        Зарегистрированные жанры
                       </h5>
                       <span className="badge bg-primary rounded-pill">
                         {filteredPlants.length} найдено
@@ -170,7 +170,7 @@ export const Species = () => {
                           <table className="table table-hover align-middle mb-0">
                             <thead className="bg-blue-10">
                               <tr>
-                                <th>Название вида</th>
+                                <th>Название жанра</th>
                                 <th width="100" className="text-end">Действия</th>
                               </tr>
                             </thead>
@@ -209,7 +209,7 @@ export const Species = () => {
                           ) : (
                             <div className="alert alert-info mx-3 mb-0">
                               <i className="bi bi-info-circle me-2"></i>
-                              Список видов пуст. Добавьте первый вид.
+                              Список жанров пуст. Добавьте первый жанр.
                             </div>
                           )}
                         </div>

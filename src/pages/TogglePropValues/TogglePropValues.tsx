@@ -125,7 +125,7 @@ export const TogglePropValues = () => {
             value={selectedClass}
             onChange={(e) => handleClassChange(e.target.value)}
           >
-            <option value="">-- Выберите класс --</option>
+            <option value="">-- Выберите жанр --</option>
             {classes.map((cls) => (
               <option key={cls.name} value={cls.name}>{cls.name}</option>
             ))}

@@ -11,13 +11,13 @@ function KnowledgeBaseEditor() {
   const location = useLocation();
 
   const tabs = [
-    { label: 'Виды музыки', path: '/species' },
+    { label: 'Жанры музыки', path: '/species' },
     { label: 'Свойства', path: '/properties' },
     { label: 'Возможные значения', path: '/possible-values' },
     { label: 'Активация свойств', path: '/property-descriptions' },
     { label: 'Активация значений', path: '/property-values' },
     { label: 'Проверка полноты знаний', path: '/completeness-check' },
-    { label: 'Определить класс', path: '/identify' },
+    { label: 'Определить жанр', path: '/identify' },
   ];
 
   return (

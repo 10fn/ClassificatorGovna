@@ -91,7 +91,7 @@ export const Properties = () => {
                   <input
                     type="text"
                     className="form-control border-primary border-opacity-50"
-                    placeholder="Например: Цвет листьев"
+                    placeholder="Например: Тематика"
                     value={newPropertyName}
                     onChange={(e) => setNewPropertyName(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAddProperty()}

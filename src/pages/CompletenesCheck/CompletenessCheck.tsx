@@ -49,8 +49,8 @@ export const CompletenessCheck = () => {
           <div className="card border-0 shadow-lg mb-4">
             <div className="card-body p-4">
               {data?.isError ? (
-                <div className="row">
-                  <div className="col-md-8">
+                <div >
+                  <div >
                     <div className="alert alert-warning border-warning">
                       <h4 className="alert-heading d-flex align-items-center">
                         <i className="bi bi-exclamation-octagon-fill text-danger me-2"></i>
@@ -94,23 +94,6 @@ export const CompletenessCheck = () => {
                             </div>
                           </div>
                         ))}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-md-4">
-                    <div className="sticky-top pt-3">
-                      <div className="card bg-light border-primary">
-                        <div className="card-header bg-primary text-white">
-                          <i className="bi bi-info-circle-fill me-2"></i>
-                          Рекомендации
-                        </div>
-                        <div className="card-body">
-                          <p>Для завершения анализа необходимо заполнить все отмеченные поля.</p>
-                          <button className="btn btn-primary w-100 mt-2">
-                            <i className="bi bi-arrow-right me-2"></i>
-                            Перейти к заполнению
-                          </button>
-                        </div>
                       </div>
                     </div>
                   </div>
