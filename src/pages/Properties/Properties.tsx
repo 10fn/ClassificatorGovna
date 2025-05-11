@@ -8,7 +8,8 @@ import {
 
 export const Properties = () => {
   const [newPropertyName, setNewPropertyName] = useState('');
-  
+  const [newPropertyType, setNewPropertyType] = useState<'numeric' | 'enum'>('numeric');
+
   const { data: properties, isLoading, isError } = useQuery(usePropertiesQuery());
 
   const { mutate: addProperty, isPending: isAdding } = useMutation({
@@ -16,6 +17,7 @@ export const Properties = () => {
     onSuccess: () => {
       addPropertyMutation.onSuccess();
       setNewPropertyName('');
+      setNewPropertyType('numeric');
     }
   });
   
@@ -27,7 +29,10 @@ export const Properties = () => {
 
   const handleAddProperty = () => {
     if (newPropertyName.trim()) {
-      addProperty(newPropertyName.trim());
+      addProperty({ 
+        name: newPropertyName, 
+        type: newPropertyType 
+      });
     }
   };
 
@@ -36,6 +41,7 @@ export const Properties = () => {
       deleteProperty(propertyName);
     }
   };
+
 
   if (isLoading) {
     return (
@@ -96,6 +102,14 @@ export const Properties = () => {
                     onChange={(e) => setNewPropertyName(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAddProperty()}
                   />
+                  <select
+                    className="form-select border-primary border-opacity-50"
+                    value={newPropertyType}
+                    onChange={(e) => setNewPropertyType(e.target.value as 'numeric' | 'enum')}
+                  >
+                    <option value="numeric">Числовое</option>
+                    <option value="enum">Перечисление</option>
+                  </select>
                   <button
                     className="btn btn-primary"
                     onClick={handleAddProperty}
@@ -177,6 +191,3 @@ export const Properties = () => {
     </div>
   );
 };
-
-// Добавьте в ваш CSS:
-// .bg-blue-10 { background

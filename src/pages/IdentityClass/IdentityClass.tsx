@@ -52,45 +52,49 @@ export const IdentifyClass = () => {
 
   const handleRulesSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+  
     const selectedProperties: SelectedProperty[] = Object.entries(selectedValues)
-      .filter(([_, value]) => value !== undefined)
+      .filter(([_, value]) => value !== undefined && value !== '' && value !== '-- Не выбрано --' && (typeof value !== 'number' || !isNaN(value)))  // Для числовых значений
       .map(([name, value]) => ({ name, value }));
-
+  
     if (selectedProperties.length === 0) {
       alert('Выберите хотя бы одно свойство');
       return;
     }
-
+  
     identifyClass(selectedProperties, {
       onSuccess: (data) => setResult(data.classes),
       onError: () => alert('Ошибка при идентификации')
     });
   };
-
+  
   const handleModelSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+  
     const selectedProperties: SelectedProperty[] = [
       { name: 'форма', value: modelValues.form },
       { name: 'цвет', value: modelValues.color },
       { name: 'размер', value: modelValues.size },
       { name: 'жилкование', value: modelValues.venation }
-    ].filter(item => item.value);
-
+    ]
+    .filter(item => item.value && item.value !== '-- Не выбрано --' && (typeof item.value !== 'number' || !isNaN(item.value)))  // Для числовых значений
+    .map(item => ({ name: item.name, value: item.value }));
+  
     if (selectedProperties.length === 0) {
       alert('Заполните хотя бы одно поле');
       return;
     }
-
+  
     predictClass(selectedProperties, {
       onSuccess: (data) => {
-        setResult(data.classes)
-        alert('Наиболее подходящие жанры: ' + data.predicted_class)
+        setResult(data.classes);
+        alert('Наиболее подходящие жанры: ' + data.predicted_class);
       },
       onError: () => alert('Модель не смогла определить жанр')
     });
   };
+  
+  
 
   if (isLoading) {
     return (
