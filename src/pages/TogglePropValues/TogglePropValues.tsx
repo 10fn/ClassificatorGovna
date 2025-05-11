@@ -119,7 +119,7 @@ export const TogglePropValues = () => {
         <h2 className="h5 text-primary mb-4">Управление значениями свойств</h2>
   
         <div className="mb-4">
-          <label className="form-label fw-semibold text-primary">Класс</label>
+          <label className="form-label fw-semibold text-primary">Жанр</label>
           <select 
             className="form-select border-primary"
             value={selectedClass}

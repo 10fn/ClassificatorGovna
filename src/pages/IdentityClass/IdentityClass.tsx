@@ -86,9 +86,9 @@ export const IdentifyClass = () => {
     predictClass(selectedProperties, {
       onSuccess: (data) => {
         setResult(data.classes)
-        alert('Наиболее подходящие классы: ' + data.predicted_class)
+        alert('Наиболее подходящие жанры: ' + data.predicted_class)
       },
-      onError: () => alert('Модель не смогла определить класс')
+      onError: () => alert('Модель не смогла определить жанр')
     });
   };
 
@@ -241,7 +241,7 @@ export const IdentifyClass = () => {
                           ) : (
                             <>
                               <i className="bi bi-search me-2"></i>
-                              Определить класс
+                              Определить жанр
                             </>
                           )}
                         </button>
