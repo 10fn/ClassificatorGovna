@@ -114,119 +114,108 @@ export const TogglePropValues = () => {
   };
 
   return (
-    <div className="container my-4">
-      <div className="card border-success shadow">
-        <div className="card-header bg-success text-white">
-          <h2 className="h5 mb-0">Управление значениями свойств</h2>
+    <div className="container my-5">
+      <section className="p-4 border rounded shadow-sm border-primary">
+        <h2 className="h5 text-primary mb-4">Управление значениями свойств</h2>
+  
+        <div className="mb-4">
+          <label className="form-label fw-semibold text-primary">Класс</label>
+          <select 
+            className="form-select border-primary"
+            value={selectedClass}
+            onChange={(e) => handleClassChange(e.target.value)}
+          >
+            <option value="">-- Выберите класс --</option>
+            {classes.map((cls) => (
+              <option key={cls.name} value={cls.name}>{cls.name}</option>
+            ))}
+          </select>
         </div>
-        
-        <div className="card-body">
-          <div className="row">
-            <div className="col-md-4 mb-3">
-              <label className="form-label">Выберите класс</label>
-              <select 
-                className="form-select border-success"
-                value={selectedClass}
-                onChange={(e) => handleClassChange(e.target.value)}
-              >
-                <option value="">-- Выберите класс --</option>
-                {classes.map((cls) => (
-                  <option key={cls.name} value={cls.name}>{cls.name}</option>
-                ))}
-              </select>
+  
+        {selectedClass && (
+          <div className="mb-4">
+            <label className="form-label fw-semibold text-primary">Свойства</label>
+            <div className="d-flex flex-wrap gap-2">
+              {classProps.map((prop) => (
+                <button
+                  key={prop.name}
+                  className={`btn btn-sm ${selectedProp?.name === prop.name ? 'btn-primary' : 'btn-outline-primary'}`}
+                  onClick={() => handlePropSelect(prop)}
+                >
+                  {prop.name} <span className="badge bg-light text-primary">{prop.type}</span>
+                </button>
+              ))}
             </div>
-
-            {selectedClass && (
-              <div className="col-md-4 mb-3">
-                <label className="form-label">Выберите свойство</label>
-                <div className="list-group">
-                  {classProps.map((prop) => (
-                    <button
-                      key={prop.name}
-                      className={`list-group-item list-group-item-action ${selectedProp?.name === prop.name ? 'active bg-success border-success' : ''}`}
-                      onClick={() => handlePropSelect(prop)}
-                    >
-                      {prop.name} ({prop.type})
-                    </button>
-                  ))}
+          </div>
+        )}
+  
+        {selectedProp && (
+          <div className="mt-4">
+            <h5 className="text-primary mb-3">Значения: {selectedProp.name}</h5>
+  
+            {selectedProp.type === 'numeric' ? (
+              <div className="row g-3 align-items-end mb-3">
+                <div className="col-sm-5">
+                  <label className="form-label">От</label>
+                  <input
+                    type="number"
+                    className="form-control border-primary"
+                    value={getNumericRange(selectedClass, selectedProp.name)[0]}
+                    onChange={(e) => handleNumericRangeChange(selectedProp.name, 0, e.target.value)}
+                  />
                 </div>
+                <div className="col-sm-5">
+                  <label className="form-label">До</label>
+                  <input
+                    type="number"
+                    className="form-control border-primary"
+                    value={getNumericRange(selectedClass, selectedProp.name)[1]}
+                    onChange={(e) => handleNumericRangeChange(selectedProp.name, 1, e.target.value)}
+                  />
+                </div>
+                <div className="col-sm-2">
+                  <button
+                    className="btn btn-primary w-100"
+                    onClick={handleNumericRangeSubmit}
+                  >
+                    Применить
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="d-flex flex-column gap-2">
+                {selectedProp.values.map((value) => {
+                  const currentState = getValueState(
+                    selectedClass,
+                    selectedProp.name,
+                    value.name,
+                    value.isActive
+                  );
+  
+                  return (
+                    <div key={value.name} className="d-flex align-items-center">
+                      <div className="form-check form-switch">
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          role="switch"
+                          id={`value-${value.name}`}
+                          checked={currentState === 'on'}
+                          onChange={() => handleValueToggle(value.name, currentState)}
+                        />
+                        <label className="form-check-label ms-2" htmlFor={`value-${value.name}`}>
+                          {value.name}
+                        </label>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
-
-          {selectedProp && (
-            <div className="mt-4">
-              <h5 className="text-success">Значения свойства: {selectedProp.name}</h5>
-              
-              {selectedProp.type === 'numeric' ? (
-                <div className="card p-3 mb-3">
-                  <div className="row g-3">
-                    <div className="col-md-5">
-                      <label className="form-label">От</label>
-                      <input
-                        type="number"
-                        className="form-control"
-                        value={getNumericRange(selectedClass, selectedProp.name)[0]}
-                        onChange={(e) => 
-                          handleNumericRangeChange(selectedProp.name, 0, e.target.value)
-                        }
-                      />
-                    </div>
-                    <div className="col-md-5">
-                      <label className="form-label">До</label>
-                      <input
-                        type="number"
-                        className="form-control"
-                        value={getNumericRange(selectedClass, selectedProp.name)[1]}
-                        onChange={(e) => 
-                          handleNumericRangeChange(selectedProp.name, 1, e.target.value)
-                        }
-                      />
-                    </div>
-                    <div className="col-md-2 d-flex align-items-end">
-                      <button
-                        className="btn btn-success"
-                        onClick={handleNumericRangeSubmit}
-                      >
-                        Применить
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="list-group">
-                  {selectedProp.values.map((value) => {
-                    const currentState = getValueState(
-                      selectedClass,
-                      selectedProp.name,
-                      value.name,
-                      value.isActive
-                    );
-                    
-                    return (
-                      <div key={value.name} className="list-group-item">
-                        <div className="form-check form-switch">
-                          <input
-                            className="form-check-input"
-                            type="checkbox"
-                            role="switch"
-                            id={`value-${value.name}`}
-                            checked={currentState === 'on'}
-                            onChange={() => handleValueToggle(value.name, currentState)}
-                          />
-                          <label className="form-check-label" htmlFor={`value-${value.name}`}>
-                            {value.name}
-                          </label>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
+        )}
+      </section>
     </div>
   );
+  
 };

@@ -8,8 +8,9 @@ import {
 
 export const Species = () => {
   const [newPlantName, setNewPlantName] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   
-  const { data: plants } = useQuery(usePlantsQuery());
+  const { data: plants = [], isLoading, isError } = useQuery(usePlantsQuery());
 
   const { mutate: addPlant, isPending: isAdding } = useMutation({
     mutationFn: addPlantMutation.fn,
@@ -21,79 +22,216 @@ export const Species = () => {
   
   const { mutate: deletePlant, isPending: isDeleting } = useMutation({
     mutationFn: deletePlantMutation.fn,
-    onSuccess: deletePlantMutation.onSuccess
+    onSuccess: deletePlantMutation.onSuccess,
+    onError: () => alert('Нельзя удалить вид, пока есть связанные растения')
   });
 
-  const handleAddPlant = () => {
-    addPlant(newPlantName.trim());
+  const filteredPlants = plants.filter(plant =>
+    plant.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleAddPlant = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPlantName.trim()) {
+      addPlant(newPlantName.trim());
+    }
   };
 
   const handleDeletePlant = (plantName: string) => {
-    deletePlant(plantName);
+    if (window.confirm(`Удалить вид "${plantName}"?`)) {
+      deletePlant(plantName);
+    }
   };
 
-  return (
-    <div className="container my-4">
-      <div className="card border-success shadow">
-        <div className="card-header bg-success text-white">
-          <h2 className="h5 mb-0">Список видов растений</h2>
-        </div>
-        
-        <div className="card-body">
-          <div className="d-flex gap-2 mb-3">
-            <input
-              type="text"
-              className="form-control form-control-lg border-success"
-              placeholder="Введите название растения"
-              value={newPlantName}
-              onChange={(e) => setNewPlantName(e.target.value)}
-            />
-            <button
-              className="btn btn-success btn-lg"
-              onClick={handleAddPlant}
-              disabled={isAdding || !newPlantName.trim()}
-            >
-              {isAdding ? (
-                <>
-                  <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                  Добавление...
-                </>
-              ) : (
-                <>
-                  <i className="bi bi-plus-circle me-2"></i>
-                  Добавить
-                </>
-              )}
-            </button>
+  if (isLoading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-50">
+        <div className="text-center">
+          <div className="spinner-border text-primary" style={{ width: '3rem', height: '3rem' }} role="status">
+            <span className="visually-hidden">Загрузка...</span>
           </div>
+          <h3 className="mt-3 text-primary">Загрузка видов...</h3>
+        </div>
+      </div>
+    );
+  }
 
-          {plants && plants.length > 0 ? (
-            <div className="list-group">
-              {plants.map((plant) => (
-                <div key={plant} className="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                  <span className="fw-bold text-success">{plant}</span>
-                  <button
-                    className="btn btn-outline-success btn-sm"
-                    onClick={() => handleDeletePlant(plant)}
-                    disabled={isDeleting}
-                  >
-                    {isDeleting ? (
-                      <span className="spinner-border spinner-border-sm" role="status"></span>
-                    ) : (
-                      <i className="bi bi-trash"></i>
-                    )}
-                  </button>
+  if (isError) {
+    return (
+      <div className="container mt-5">
+        <div className="alert alert-danger d-flex align-items-center">
+          <i className="bi bi-x-circle-fill me-3 fs-4"></i>
+          <div>
+            <h4 className="alert-heading">Ошибка загрузки</h4>
+            <p className="mb-0">Не удалось загрузить список видов музыки</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container-fluid py-4 px-lg-5">
+      <div className="row justify-content-center">
+        <div className="col-lg-10 col-xl-8">
+          <div className="card border-0 shadow-lg">
+            <div className="card-header bg-primary text-white py-3">
+              <div className="d-flex justify-content-between align-items-center">
+                <h2 className="h4 mb-0">
+                  <i className="bi bi-flower2 me-2"></i>
+                  Каталог видов музыки
+                </h2>
+                <span className="badge bg-light text-primary rounded-pill">
+                  {plants.length} видов
+                </span>
+              </div>
+            </div>
+
+            <div className="card-body p-4">
+              <div className="row g-4">
+                {/* Панель добавления нового вида */}
+                <div className="col-md-12">
+                  <div className="card border-primary border-opacity-25">
+                    <div className="card-header bg-blue-10 py-2">
+                      <h5 className="mb-0 text-primary">
+                        <i className="bi bi-plus-circle me-2"></i>
+                        Добавить новый вид
+                      </h5>
+                    </div>
+                    <div className="card-body">
+                      <form onSubmit={handleAddPlant}>
+                        <div className="input-group">
+                          <input
+                            type="text"
+                            className="form-control border-primary border-opacity-50"
+                            placeholder="Например: Роза обыкновенная"
+                            value={newPlantName}
+                            onChange={(e) => setNewPlantName(e.target.value)}
+                          />
+                          <button
+                            className="btn btn-primary"
+                            type="submit"
+                            disabled={isAdding || !newPlantName.trim()}
+                          >
+                            {isAdding ? (
+                              <>
+                                <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                                Добавление
+                              </>
+                            ) : (
+                              <>
+                                <i className="bi bi-save me-2"></i>
+                                Сохранить
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
                 </div>
-              ))}
+
+                {/* Панель поиска */}
+                <div className="col-md-12">
+                  <div className="card border-primary border-opacity-25">
+                    <div className="card-header bg-blue-10 py-2">
+                      <h5 className="mb-0 text-primary">
+                        <i className="bi bi-search me-2"></i>
+                        Поиск видов
+                      </h5>
+                    </div>
+                    <div className="card-body">
+                      <input
+                        type="text"
+                        className="form-control border-primary border-opacity-50"
+                        placeholder="Введите название для поиска..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Список видов */}
+                <div className="col-md-12">
+                  <div className="card border-primary border-opacity-25">
+                    <div className="card-header bg-blue-10 py-2 d-flex justify-content-between align-items-center">
+                      <h5 className="mb-0 text-primary">
+                        <i className="bi bi-list-ul me-2"></i>
+                        Зарегистрированные виды
+                      </h5>
+                      <span className="badge bg-primary rounded-pill">
+                        {filteredPlants.length} найдено
+                      </span>
+                    </div>
+                    <div className="card-body p-0">
+                      {filteredPlants.length > 0 ? (
+                        <div className="table-responsive">
+                          <table className="table table-hover align-middle mb-0">
+                            <thead className="bg-blue-10">
+                              <tr>
+                                <th>Название вида</th>
+                                <th width="100" className="text-end">Действия</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {filteredPlants.map((plant) => (
+                                <tr key={plant}>
+                                  <td>
+                                    <span className="fw-semibold">{plant}</span>
+                                  </td>
+                                  <td className="text-end">
+                                    <button
+                                      className="btn btn-outline-danger btn-sm"
+                                      onClick={() => handleDeletePlant(plant)}
+                                      disabled={isDeleting}
+                                      title="Удалить вид"
+                                    >
+                                      {isDeleting ? (
+                                        <span className="spinner-border spinner-border-sm" role="status"></span>
+                                      ) : (
+                                        <i className="bi bi-trash"></i>
+                                      )}
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      ) : (
+                        <div className="text-center py-4">
+                          {searchTerm ? (
+                            <div className="alert alert-warning mx-3 mb-0">
+                              <i className="bi bi-exclamation-triangle me-2"></i>
+                              Виды по запросу "{searchTerm}" не найдены
+                            </div>
+                          ) : (
+                            <div className="alert alert-info mx-3 mb-0">
+                              <i className="bi bi-info-circle me-2"></i>
+                              Список видов пуст. Добавьте первый вид.
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          ) : (
-            <div className="alert alert-success">
-              <i className="bi bi-info-circle me-2"></i>
-              Нет растений в списке. Добавьте первое растение.
+
+            <div className="card-footer bg-blue-10 py-3">
+              <small className="text-muted">
+                <i className="bi bi-info-circle me-2"></i>
+                Здесь вы можете управлять базой данных видов музыки
+              </small>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
   );
 };
+
+// Добавьте в ваш CSS:
+// .bg-blue-10 { background-color: rgba(13, 110, 253, 0.1); }
