@@ -40,7 +40,7 @@ export const Properties = () => {
     <div className="container my-4">
       <div className="card shadow-lg" style={{ border: '2px solid #e74c3c', backgroundColor: '#f9f9f9' }}>
         <div className="card-header" style={{ backgroundColor: '#e74c3c', color: '#fff' }}>
-          <h2 className="h4 mb-0">Список свойств растений</h2>
+          <h2 className="h4 mb-0">Список свойств оружия</h2>
         </div>
         
         <div className="card-body">

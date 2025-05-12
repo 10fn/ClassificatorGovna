@@ -36,7 +36,7 @@ export const Species = () => {
     <div className="container my-4">
       <div className="card border-danger shadow-lg">
         <div className="card-header bg-danger text-white">
-          <h2 className="h5 mb-0">Список видов растений</h2>
+          <h2 className="h5 mb-0">Список моделей оружия</h2>
         </div>
         
         <div className="card-body">
@@ -44,7 +44,7 @@ export const Species = () => {
             <input
               type="text"
               className="form-control form-control-lg border-danger"
-              placeholder="Введите название растения"
+              placeholder="Введите название модели оружия"
               value={newPlantName}
               onChange={(e) => setNewPlantName(e.target.value)}
             />
@@ -89,7 +89,7 @@ export const Species = () => {
           ) : (
             <div className="alert alert-danger">
               <i className="bi bi-info-circle me-2"></i>
-              Нет растений в списке. Добавьте первое растение.
+              Нет оружия в списке. Добавьте первую модель оружия.
             </div>
           )}
         </div>

@@ -43,7 +43,7 @@ export const ToggleClassProps = () => {
         
         <div className="card-body">
           <div className="mb-4">
-            <label className="form-label">Выберите класс растения</label>
+            <label className="form-label">Выберите модель оружия</label>
             <select 
               className="form-select"
               value={selectedClass}

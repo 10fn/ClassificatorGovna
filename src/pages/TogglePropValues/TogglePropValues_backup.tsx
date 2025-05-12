@@ -1,3 +1,4 @@
+//Блять
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { 
@@ -11,19 +12,40 @@ export const TogglePropValues = () => {
   const [selectedClass, setSelectedClass] = useState<string>('');
   const [selectedProp, setSelectedProp] = useState<ClassProp | null>(null);
   const [localValues, setLocalValues] = useState<Record<string, 'on' | 'off'>>({});
-  const [numericValues, setNumericValues] = useState<Record<string, string>>({});
-
+  const [numericRanges, setNumericRanges] = useState<Record<string, [string, string]>>({});
+  
   const { data: classes = [] } = useQuery<ClassWithPropValues[]>(useClassesWithPropValuesQuery());
   const { mutate: toggleValue } = useTogglePropValue();
 
   const currentClass = classes.find((c) => c.name === selectedClass);
   const classProps = currentClass?.props || [];
 
+  // Автоматически заполняем диапазон для numeric свойств при выборе свойства
+  useEffect(() => {
+    if (selectedProp && selectedProp.type === 'numeric') {
+      const activeValues = selectedProp.values
+        .filter(v => v.isActive === 'on')
+        .map(v => parseFloat(v.name))
+        .filter(v => !isNaN(v));
+
+      if (activeValues.length > 0) {
+        const min = Math.min(...activeValues).toString();
+        const max = Math.max(...activeValues).toString();
+        const key = `${selectedClass}-${selectedProp.name}`;
+        
+        setNumericRanges(prev => ({
+          ...prev,
+          [key]: [min, max]
+        }));
+      }
+    }
+  }, [selectedProp, selectedClass]);
+
   const handleClassChange = (className: string) => {
     setSelectedClass(className);
     setSelectedProp(null);
     setLocalValues({});
-    setNumericValues({});
+    setNumericRanges({});
   };
 
   const handlePropSelect = (prop: ClassProp) => {
@@ -34,7 +56,7 @@ export const TogglePropValues = () => {
     if (!selectedClass || !selectedProp) return;
 
     const newState = currentState === 'on' ? 'off' : 'on';
-
+    
     setLocalValues(prev => ({
       ...prev,
       [`${selectedClass}-${selectedProp.name}-${valueName}`]: newState
@@ -51,27 +73,33 @@ export const TogglePropValues = () => {
     });
   };
 
-  const handleNumericValueChange = (propName: string, value: string) => {
+  const handleNumericRangeChange = (propName: string, index: 0 | 1, value: string) => {
     if (!selectedClass) return;
+
     const key = `${selectedClass}-${propName}`;
-    setNumericValues(prev => ({ ...prev, [key]: value }));
+    setNumericRanges(prev => {
+      const currentRange = prev[key] || ['', ''];
+      const newRange = [...currentRange] as [string, string];
+      newRange[index] = value;
+      return { ...prev, [key]: newRange };
+    });
   };
 
-  const handleNumericValueSubmit = () => {
+  const handleNumericRangeSubmit = () => {
     if (!selectedClass || !selectedProp) return;
 
     const key = `${selectedClass}-${selectedProp.name}`;
-    const value = numericValues[key];
-
-    if (value) {
+    const range = numericRanges[key];
+    
+    if (range && range[0] && range[1]) {
       toggleValue({
         className: selectedClass,
         propName: selectedProp.name,
         propType: selectedProp.type,
-        values: [{
+        values: range.map(value => ({
           valueName: value,
           isActive: 'on'
-        }]
+        }))
       });
     }
   };
@@ -81,9 +109,9 @@ export const TogglePropValues = () => {
     return localValues[key] ?? serverState;
   };
 
-  const getNumericValue = (className: string, propName: string): string => {
+  const getNumericRange = (className: string, propName: string): [string, string] => {
     const key = `${className}-${propName}`;
-    return numericValues[key] || '';
+    return numericRanges[key] || ['', ''];
   };
 
   return (
@@ -92,7 +120,7 @@ export const TogglePropValues = () => {
         <div className="card-header bg-danger text-white">
           <h2 className="h5 mb-0">Управление значениями свойств</h2>
         </div>
-
+        
         <div className="card-body">
           <div className="row">
             <div className="col-md-4 mb-3">
@@ -130,25 +158,36 @@ export const TogglePropValues = () => {
           {selectedProp && (
             <div className="mt-4">
               <h5 className="text-danger">Значения свойства: {selectedProp.name}</h5>
-
+              
               {selectedProp.type === 'numeric' ? (
                 <div className="card p-3 mb-3" style={{ backgroundColor: '#ffe6e6' }}>
                   <div className="row g-3">
-                    <div className="col-md-10">
-                      <label className="form-label">Введите значение</label>
+                    <div className="col-md-5">
+                      <label className="form-label">От</label>
                       <input
                         type="number"
                         className="form-control"
-                        value={getNumericValue(selectedClass, selectedProp.name)}
-                        onChange={(e) =>
-                          handleNumericValueChange(selectedProp.name, e.target.value)
+                        value={getNumericRange(selectedClass, selectedProp.name)[0]}
+                        onChange={(e) => 
+                          handleNumericRangeChange(selectedProp.name, 0, e.target.value)
+                        }
+                      />
+                    </div>
+                    <div className="col-md-5">
+                      <label className="form-label">До</label>
+                      <input
+                        type="number"
+                        className="form-control"
+                        value={getNumericRange(selectedClass, selectedProp.name)[1]}
+                        onChange={(e) => 
+                          handleNumericRangeChange(selectedProp.name, 1, e.target.value)
                         }
                       />
                     </div>
                     <div className="col-md-2 d-flex align-items-end">
                       <button
                         className="btn btn-danger"
-                        onClick={handleNumericValueSubmit}
+                        onClick={handleNumericRangeSubmit}
                       >
                         Применить
                       </button>
@@ -164,7 +203,7 @@ export const TogglePropValues = () => {
                       value.name,
                       value.isActive
                     );
-
+                    
                     return (
                       <div key={value.name} className="list-group-item">
                         <div className="form-check form-switch">

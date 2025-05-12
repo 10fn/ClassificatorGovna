@@ -11,13 +11,13 @@ function KnowledgeBaseEditor() {
   const location = useLocation();
 
   const tabs = [
-    { label: 'Виды оружий', path: '/species' },
+    { label: 'Модели оружия', path: '/species' },
     { label: 'Свойства', path: '/properties' },
     { label: 'Возможные значения', path: '/possible-values' },
-    { label: 'Активация свойств', path: '/property-descriptions' },
-    { label: 'Активация значений', path: '/property-values' },
+    { label: 'Описания свойств модели', path: '/property-descriptions' },
+    { label: 'Значения свойств модели', path: '/property-values' },
     { label: 'Проверка полноты знаний', path: '/completeness-check' },
-    { label: 'Определить класс', path: '/identify' },
+    { label: 'Определить модель', path: '/identify' },
   ];
 
   return (

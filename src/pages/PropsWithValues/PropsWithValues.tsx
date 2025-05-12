@@ -36,7 +36,7 @@ export const PropsWithValues = () => {
     <div className="container my-4">
       <div className="card border-danger shadow-lg">
         <div className="card-header bg-danger text-white">
-          <h2 className="h5 mb-0">Значения свойств растений</h2>
+          <h2 className="h5 mb-0">Значения свойств оружия</h2>
         </div>
         
         <div className="card-body">

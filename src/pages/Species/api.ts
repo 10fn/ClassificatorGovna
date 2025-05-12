@@ -11,16 +11,7 @@ const api = {
   deletePlant: (name: string) => axios.delete(`http://localhost:5000/classesDELETE?name=${name}`)
 };
 
-// const mockApi = {
-//   getPlants: async () => [...mockPlants],
-//   addPlant: async (name: string) => {
-//     mockPlants.push(name);
-//   },
-//   deletePlant: async (name: string) => {
-//     const index = mockPlants.indexOf(name);
-//     if (index !== -1) mockPlants.splice(index, 1);
-//   }
-// };
+
 
 export const usePlantsQuery = () => ({
   queryKey: ['plants'],

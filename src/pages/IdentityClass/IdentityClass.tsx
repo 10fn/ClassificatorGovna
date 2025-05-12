@@ -109,9 +109,9 @@ export const IdentifyClass = () => {
     predictClass(selectedProperties, {
       onSuccess: (data) => {
         setFinalResult([data.predicted_class]);
-        alert('Наиболее подходящие классы: ' + data.predicted_class);
+        alert('Наиболее подходящая модель оружия: ' + data.predicted_class);
       },
-      onError: () => alert('Модель не смогла определить класс')
+      onError: () => alert('ИИ не смог определить модель оружия')
     });
   };
 
@@ -158,7 +158,7 @@ export const IdentifyClass = () => {
                 className={`nav-link ${activeTab === 'model' ? 'active' : ''}`}
                 onClick={() => setActiveTab('model')}
               >
-                Через модель
+                Через ИИ модель
               </button>
             </li>
           </ul>
@@ -223,7 +223,7 @@ export const IdentifyClass = () => {
                 ) : (
                   <>
                     <i className="bi bi-search me-2"></i>
-                    Определить класс
+                    Определить
                   </>
                 )}
               </button>
@@ -231,7 +231,7 @@ export const IdentifyClass = () => {
           ) : (
             <form onSubmit={handleModelSubmit}>
               <div className="mb-4">
-                <label className="form-label text-danger"><strong>Страна</strong></label>
+                <label className="form-label text-danger"><strong>Страна производитель</strong></label>
                 <select
                   className="form-select border-danger"
                   value={modelValues.country}
@@ -250,7 +250,7 @@ export const IdentifyClass = () => {
               </div>
 
               <div className="mb-4">
-                <label className="form-label text-danger"><strong>Рукоять</strong></label>
+                <label className="form-label text-danger"><strong>Тип хвата</strong></label>
                 <select
                   className="form-select border-danger"
                   value={modelValues.grip}
@@ -300,7 +300,7 @@ export const IdentifyClass = () => {
               </div>
 
               <div className="mb-4">
-                <label className="form-label text-danger"><strong>Питание</strong></label>
+                <label className="form-label text-danger"><strong>Тип питания</strong></label>
                 <select
                   className="form-select border-danger"
                   value={modelValues.feed}
@@ -320,7 +320,7 @@ export const IdentifyClass = () => {
                   className="form-control border-danger"
                   value={modelValues.magazine_capacity}  
                   onChange={(e) => handleModelValueChange('magazine_capacity', e.target.value)}
-                  placeholder="Введите емкость"
+                  placeholder="Введите размер магазина"
                 />
               </div>
 
@@ -364,34 +364,36 @@ export const IdentifyClass = () => {
             <div className="mt-4">
               <h5 className="text-danger mb-3">Процесс идентификации:</h5>
               
-              {processSteps.length > 0 && (
-                <div className="table-responsive mb-4">
-                  <table className="table table-bordered table-hover">
-                    <thead className="table-danger">
-                      <tr>
-                        <th>Шаг</th>
-                        <th>Проверяемое свойство</th>
-                        <th>Исключенные классы</th>
+            {processSteps.length > 0 && (
+              <div className="table-responsive mb-4">
+                <table className="table table-bordered table-hover">
+                  <thead className="table-danger">
+                    <tr>
+                      <th>Шаг</th>
+                      <th>Опровергнутые модели</th>
+                      <th>Причины</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {processSteps.map((step, index) => (
+                      <tr key={index}>
+                        <td>{index + 1}</td>
+                        <td>
+                          {step.classes.length > 0 ? (
+                            step.classes.join(', ')
+                          ) : (
+                            <span className="text-muted">Не исключено ни одного класса</span>
+                          )}
+                        </td>
+                        <td>{step.propName}</td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {processSteps.map((step, index) => (
-                        <tr key={index}>
-                          <td>{index + 1}</td>
-                          <td>{step.propName}</td>
-                          <td>
-                            {step.classes.length > 0 ? (
-                              step.classes.join(', ')
-                            ) : (
-                              <span className="text-muted">Не исключено ни одного класса</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+
 
               {finalResult.length > 0 && (
                 <div className={`alert ${finalResult.length === 1 ? 'alert-success' : 'alert-info'}`}>
@@ -399,11 +401,11 @@ export const IdentifyClass = () => {
                   <p className="mb-0">
                     {finalResult.length === 1 ? (
                       <>
-                        <strong>Определенный класс:</strong> {finalResult[0]}
+                        <strong>Определенная модель оружия:</strong> {finalResult[0]}
                       </>
                     ) : (
                       <>
-                        <strong>Возможные классы:</strong> {finalResult.join(', ')}
+                        <strong>Возможные модели:</strong> {finalResult.join(', ')}
                       </>
                     )}
                   </p>
@@ -413,7 +415,7 @@ export const IdentifyClass = () => {
               {finalResult.length === 0 && processSteps.length > 0 && (
                 <div className="alert alert-warning">
                   <h5 className="alert-heading">Результат идентификации:</h5>
-                  <p className="mb-0">Не удалось определить класс по заданным свойствам</p>
+                  <p className="mb-0">Не удалось определить модель оружия по заданным свойствам</p>
                 </div>
               )}
             </div>
