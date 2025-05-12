@@ -13,11 +13,17 @@ export interface SelectedProperty {
   value: string | number;
 }
 
-interface IdentifyClassResponse {
+interface ProcessStep {
+  propName: string;
   classes: string[];
 }
 
-interface IPrecitResponse {
+interface IdentifyClassResponse {
+  process: ProcessStep[];
+  result: string[];
+}
+
+interface IPredictResponse {
   predicted_class: string;
 }
 
@@ -35,8 +41,8 @@ const identifyClass = async (properties: SelectedProperty[]): Promise<IdentifyCl
   return response.data;
 };
 
-const predictClass = async (properties: SelectedProperty[]): Promise<IPrecitResponse> => {
-  const response = await axios.post<IPrecitResponse>(
+const predictClass = async (properties: SelectedProperty[]): Promise<IPredictResponse> => {
+  const response = await axios.post<IPredictResponse>(
     'http://localhost:5000/predict-class',
     properties
   );
