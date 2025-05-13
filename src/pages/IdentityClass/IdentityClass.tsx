@@ -31,7 +31,8 @@ export const IdentifyClass = () => {
     dynamics: '',
     spectralDensity: ''
   });
-  const [result, setResult] = useState<string[] | null>(null);
+  const [processSteps, setProcessSteps] = useState<{ propName: string; classes: string[] }[]>([]);
+  const [finalResult, setFinalResult] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<'rules' | 'model'>('rules');
 
   const handleValueChange = (propertyName: string, value: string | number) => {
@@ -39,7 +40,8 @@ export const IdentifyClass = () => {
       ...prev,
       [propertyName]: value
     }));
-    setResult(null);
+    setProcessSteps([]);
+    setFinalResult([]);
   };
 
   const handleModelValueChange = (field: keyof typeof modelValues, value: string) => {
@@ -47,14 +49,14 @@ export const IdentifyClass = () => {
       ...prev,
       [field]: value
     }));
-    setResult(null);
+    setFinalResult([]);
   };
 
   const handleRulesSubmit = (e: React.FormEvent) => {
     e.preventDefault();
   
     const selectedProperties: SelectedProperty[] = Object.entries(selectedValues)
-      .filter(([_, value]) => value !== undefined && value !== '' && value !== '-- Не выбрано --' && (typeof value !== 'number' || !isNaN(value)))  // Для числовых значений
+      .filter(([_, value]) => value !== undefined && value !== '' && value !== '-- Не выбрано --' && (typeof value !== 'number' || !isNaN(value)))
       .map(([name, value]) => ({ name, value }));
   
     if (selectedProperties.length === 0) {
@@ -63,38 +65,38 @@ export const IdentifyClass = () => {
     }
   
     identifyClass(selectedProperties, {
-      onSuccess: (data) => setResult(data.classes),
+      onSuccess: (data) => {
+        setProcessSteps(data.process);
+        setFinalResult(data.result);
+      },
       onError: () => alert('Ошибка при идентификации')
     });
   };
   
   const handleModelSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
+    e.preventDefault();
 
-		const selectedProperties: SelectedProperty[] = [
-				{ name: 'tempo', value: modelValues.tempo },
-				{ name: 'tonality', value: modelValues.tonality },
-				{ name: 'dynamics', value: modelValues.dynamics },
-				{ name: 'spectrum', value: modelValues.spectralDensity }
-			]
-			.filter(item => item.value && item.value !== '-- Не выбрано --' && (typeof item.value !== 'number' || !isNaN(item.value)))
-			.map(item => ({ name: item.name, value: item.value }));
+    const selectedProperties: SelectedProperty[] = [
+      { name: 'tempo', value: modelValues.tempo },
+      { name: 'tonality', value: modelValues.tonality },
+      { name: 'dynamics', value: modelValues.dynamics },
+      { name: 'spectrum', value: modelValues.spectralDensity }
+    ]
+    .filter(item => item.value && item.value !== '-- Не выбрано --' && (typeof item.value !== 'number' || !isNaN(item.value)))
+    .map(item => ({ name: item.name, value: item.value }));
 
-			if (selectedProperties.length === 0) {
-				alert('Заполните хотя бы одно поле');
-				return;
-			}
+    if (selectedProperties.length === 0) {
+      alert('Заполните хотя бы одно поле');
+      return;
+    }
 
-			predictClass(selectedProperties, {
-				onSuccess: (data) => {
-					setResult(data.classes);
-					alert('Наиболее подходящие жанры: ' + data.predicted_class);
-				},
-				onError: () => alert('Модель не смогла определить жанр')
-			});
-	};
-  
-  
+    predictClass(selectedProperties, {
+      onSuccess: (data) => {
+        setFinalResult([data.predicted_class]);
+      },
+      onError: () => alert('Модель не смогла определить жанр')
+    });
+  };
 
   if (isLoading) {
     return (
@@ -134,8 +136,8 @@ export const IdentifyClass = () => {
                   <i className="bi bi-flower2 me-2"></i>
                   Классификация музыки
                 </h2>
-                <span className={`badge rounded-pill ${result ? 'bg-success' : 'bg-light text-dark'} fs-6`}>
-                  {result ? 'Анализ завершен' : 'Ожидание данных'}
+                <span className={`badge rounded-pill ${finalResult.length ? 'bg-success' : 'bg-light text-dark'} fs-6`}>
+                  {finalResult.length ? 'Анализ завершен' : 'Ожидание данных'}
                 </span>
               </div>
             </div>
@@ -253,158 +255,158 @@ export const IdentifyClass = () => {
                     </form>
                   ) : (
                     <form onSubmit={handleModelSubmit}>
-											<div className="row g-3">
-												<div className="col-md-6">
-													<div className="card h-100 border-primary border-opacity-25">
-														<div className="card-header bg-blue-10 py-2">
-															<label className="form-label fw-bold mb-0 text-primary">
-																Темп (BPM)
-															</label>
-														</div>
-														<div className="card-body">
-															<input
-																type="number"
-																min="1"
-																className="form-control border-primary border-opacity-50"
-																value={modelValues.tempo || ''}
-																onChange={(e) => handleModelValueChange('tempo', e.target.value)}
-																placeholder="Введите темп (целое число)"
-															/>
-														</div>
-													</div>
-												</div>
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <div className="card h-100 border-primary border-opacity-25">
+                            <div className="card-header bg-blue-10 py-2">
+                              <label className="form-label fw-bold mb-0 text-primary">
+                                Темп (BPM)
+                              </label>
+                            </div>
+                            <div className="card-body">
+                              <input
+                                type="number"
+                                min="1"
+                                className="form-control border-primary border-opacity-50"
+                                value={modelValues.tempo || ''}
+                                onChange={(e) => handleModelValueChange('tempo', e.target.value)}
+                                placeholder="Введите темп (целое число)"
+                              />
+                            </div>
+                          </div>
+                        </div>
 
-												<div className="col-md-6">
-													<div className="card h-100 border-primary border-opacity-25">
-														<div className="card-header bg-blue-10 py-2">
-															<label className="form-label fw-bold mb-0 text-primary">
-																Тональность
-															</label>
-														</div>
-														<div className="card-body">
-															<select
-																className="form-select border-primary border-opacity-50"
-																value={modelValues.tonality || ''}
-																onChange={(e) => handleModelValueChange('tonality', e.target.value)}
-															>
-																<option value="">-- Не выбрано --</option>
-																<option value="C">C</option>
-																<option value="Am">Am</option>
-																<option value="G">G</option>
-																<option value="Em">Em</option>
-																<option value="D">D</option>
-																<option value="Bm">Bm</option>
-																<option value="A">A</option>
-																<option value="F#m">F#m</option>
-																<option value="E">E</option>
-																<option value="C#m">C#m</option>
-																<option value="B">B</option>
-																<option value="G#m">G#m</option>
-																<option value="F#">F#</option>
-																<option value="D#m">D#m</option>
-																<option value="C#">C#</option>
-																<option value="A#m">A#m</option>
-																<option value="Ab">Ab</option>
-																<option value="Fm">Fm</option>
-																<option value="Eb">Eb</option>
-																<option value="Cm">Cm</option>
-																<option value="Bb">Bb</option>
-																<option value="Gm">Gm</option>
-																<option value="F">F</option>
-																<option value="Dm">Dm</option>
-															</select>
-														</div>
-													</div>
-												</div>
+                        <div className="col-md-6">
+                          <div className="card h-100 border-primary border-opacity-25">
+                            <div className="card-header bg-blue-10 py-2">
+                              <label className="form-label fw-bold mb-0 text-primary">
+                                Тональность
+                              </label>
+                            </div>
+                            <div className="card-body">
+                              <select
+                                className="form-select border-primary border-opacity-50"
+                                value={modelValues.tonality || ''}
+                                onChange={(e) => handleModelValueChange('tonality', e.target.value)}
+                              >
+                                <option value="">-- Не выбрано --</option>
+                                <option value="C">C</option>
+                                <option value="Am">Am</option>
+                                <option value="G">G</option>
+                                <option value="Em">Em</option>
+                                <option value="D">D</option>
+                                <option value="Bm">Bm</option>
+                                <option value="A">A</option>
+                                <option value="F#m">F#m</option>
+                                <option value="E">E</option>
+                                <option value="C#m">C#m</option>
+                                <option value="B">B</option>
+                                <option value="G#m">G#m</option>
+                                <option value="F#">F#</option>
+                                <option value="D#m">D#m</option>
+                                <option value="C#">C#</option>
+                                <option value="A#m">A#m</option>
+                                <option value="Ab">Ab</option>
+                                <option value="Fm">Fm</option>
+                                <option value="Eb">Eb</option>
+                                <option value="Cm">Cm</option>
+                                <option value="Bb">Bb</option>
+                                <option value="Gm">Gm</option>
+                                <option value="F">F</option>
+                                <option value="Dm">Dm</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
 
-												<div className="col-md-6">
-													<div className="card h-100 border-primary border-opacity-25">
-														<div className="card-header bg-blue-10 py-2">
-															<label className="form-label fw-bold mb-0 text-primary">
-																Динамика
-															</label>
-														</div>
-														<div className="card-body">
-															<input
-																type="number"
-																min="1"
-																className="form-control border-primary border-opacity-50"
-																value={modelValues.dynamics || ''}
-																onChange={(e) => handleModelValueChange('dynamics', e.target.value)}
-																placeholder="Введите значение динамики"
-															/>
-														</div>
-													</div>
-												</div>
+                        <div className="col-md-6">
+                          <div className="card h-100 border-primary border-opacity-25">
+                            <div className="card-header bg-blue-10 py-2">
+                              <label className="form-label fw-bold mb-0 text-primary">
+                                Динамика
+                              </label>
+                            </div>
+                            <div className="card-body">
+                              <input
+                                type="number"
+                                min="1"
+                                className="form-control border-primary border-opacity-50"
+                                value={modelValues.dynamics || ''}
+                                onChange={(e) => handleModelValueChange('dynamics', e.target.value)}
+                                placeholder="Введите значение динамики"
+                              />
+                            </div>
+                          </div>
+                        </div>
 
-												<div className="col-md-6">
-													<div className="card h-100 border-primary border-opacity-25">
-														<div className="card-header bg-blue-10 py-2">
-															<label className="form-label fw-bold mb-0 text-primary">
-																Плотность спектра
-															</label>
-														</div>
-														<div className="card-body">
-															<input
-																type="number"
-																min="1"
-																className="form-control border-primary border-opacity-50"
-																value={modelValues.spectralDensity || ''}
-																onChange={(e) => handleModelValueChange('spectralDensity', e.target.value)}
-																placeholder="Введите плотность спектра"
-															/>
-														</div>
-													</div>
-												</div>
-											</div>
+                        <div className="col-md-6">
+                          <div className="card h-100 border-primary border-opacity-25">
+                            <div className="card-header bg-blue-10 py-2">
+                              <label className="form-label fw-bold mb-0 text-primary">
+                                Плотность спектра
+                              </label>
+                            </div>
+                            <div className="card-body">
+                              <input
+                                type="number"
+                                min="1"
+                                className="form-control border-primary border-opacity-50"
+                                value={modelValues.spectralDensity || ''}
+                                onChange={(e) => handleModelValueChange('spectralDensity', e.target.value)}
+                                placeholder="Введите плотность спектра"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
 
-											<div className="mt-4">
-												<h5 className="text-primary mb-3">
-													<i className="bi bi-card-checklist me-2"></i>
-													Введенные параметры
-												</h5>
-												<div className="row g-2">
-													{Object.entries(modelValues)
-														.filter(([_, value]) => value !== '')
-														.map(([name, value]) => (
-															<div key={name} className="col-md-6">
-																<div className="d-flex align-items-center p-2 bg-blue-10 rounded">
-																	<span className="badge bg-primary me-2">{name}</span>
-																	<span className="text-truncate">{value}</span>
-																</div>
-															</div>
-														))}
-													{Object.values(modelValues).filter(v => v !== '').length === 0 && (
-														<div className="col-12">
-															<div className="alert alert-info mb-0">
-																<i className="bi bi-info-circle me-2"></i>
-																Параметры не введены
-															</div>
-														</div>
-													)}
-												</div>
-											</div>
+                      <div className="mt-4">
+                        <h5 className="text-primary mb-3">
+                          <i className="bi bi-card-checklist me-2"></i>
+                          Введенные параметры
+                        </h5>
+                        <div className="row g-2">
+                          {Object.entries(modelValues)
+                            .filter(([_, value]) => value !== '')
+                            .map(([name, value]) => (
+                              <div key={name} className="col-md-6">
+                                <div className="d-flex align-items-center p-2 bg-blue-10 rounded">
+                                  <span className="badge bg-primary me-2">{name}</span>
+                                  <span className="text-truncate">{value}</span>
+                                </div>
+                              </div>
+                            ))}
+                          {Object.values(modelValues).filter(v => v !== '').length === 0 && (
+                            <div className="col-12">
+                              <div className="alert alert-info mb-0">
+                                <i className="bi bi-info-circle me-2"></i>
+                                Параметры не введены
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
 
-											<div className="d-grid mt-4">
-												<button
-													type="submit"
-													className="btn btn-primary btn-lg"
-													disabled={isPredicting || Object.values(modelValues).filter(v => v !== '').length === 0}
-												>
-													{isPredicting ? (
-														<>
-															<span className="spinner-border spinner-border-sm me-2" role="status"></span>
-															Прогнозирование...
-														</>
-													) : (
-														<>
-															<i className="bi bi-cpu me-2"></i>
-															Запустить модель
-														</>
-													)}
-												</button>
-											</div>
-										</form>
+                      <div className="d-grid mt-4">
+                        <button
+                          type="submit"
+                          className="btn btn-primary btn-lg"
+                          disabled={isPredicting || Object.values(modelValues).filter(v => v !== '').length === 0}
+                        >
+                          {isPredicting ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                              Прогнозирование...
+                            </>
+                          ) : (
+                            <>
+                              <i className="bi bi-cpu me-2"></i>
+                              Запустить модель
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </form>
                   )}
                 </div>
 
@@ -413,29 +415,69 @@ export const IdentifyClass = () => {
                     <div className="card border-primary">
                       <div className="card-header bg-primary text-white">
                         <i className="bi bi-info-circle me-2"></i>
-                        Информация
+                        Результаты анализа
                       </div>
                       <div className="card-body">
-                        <p className="mb-3">
-                          {activeTab === 'rules' 
-                            ? "Экспертная система анализирует выбранные параметры по заданным правилам."
-                            : "Модель машинного обучения предсказывает класс растения на основе введенных характеристик."}
-                        </p>
-                        
-                        {result && (
-                          <div className="alert alert-success">
-                            <h5 className="alert-heading">
+                        {activeTab === 'rules' && processSteps.length > 0 && (
+                          <>
+                            <h5 className="text-primary mb-3">Процесс классификации:</h5>
+                            <div className="table-responsive">
+                              <table className="table table-sm table-bordered">
+                                <thead className="bg-blue-10">
+                                  <tr>
+                                    <th className="text-primary">Свойство</th>
+                                    <th className="text-primary">Неподходящие классы</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {processSteps.map((step, index) => (
+                                    <tr key={index}>
+                                      <td className="fw-bold">{step.propName}</td>
+                                      <td>
+                                        {step.classes.length > 0 ? (
+                                          <div className="d-flex flex-wrap gap-1">
+                                            {step.classes.map(cls => (
+                                              <span key={cls} className="badge bg-info text-dark">
+                                                {cls}
+                                              </span>
+                                            ))}
+                                          </div>
+                                        ) : (
+                                          <span className="text-muted">Нет подходящих классов</span>
+                                        )}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </>
+                        )}
+
+                        {finalResult.length > 0 && (
+                          <div className="mt-4">
+                            <h5 className="text-primary mb-3">
                               <i className="bi bi-check-circle-fill me-2"></i>
-                              Результат:
+                              Финальный результат:
                             </h5>
-                            <div className="mt-2">
-                              {result.length ? result.map((cls, i) => (
-                                <span key={cls} className="badge bg-success me-1 mb-1">
-                                  {cls}
-                                </span>
-                              )) : <p>Не удалось определить класс</p>}
+                            <div className="alert alert-success">
+                              <div className="d-flex flex-wrap gap-2">
+                                {finalResult.map((cls, i) => (
+                                  <span key={cls} className="badge bg-success fs-6">
+                                    {cls}
+                                  </span>
+                                ))}
+                              </div>
                             </div>
                           </div>
+                        )}
+
+                        {processSteps.length === 0 && finalResult.length === 0 && (
+                          <p className="mb-0 text-muted">
+                            {activeTab === 'rules' 
+                              ? "Результаты анализа появятся здесь после выполнения проверки."
+                              : "Результаты прогнозирования появятся здесь после запуска модели."}
+                          </p>
                         )}
                       </div>
                     </div>
