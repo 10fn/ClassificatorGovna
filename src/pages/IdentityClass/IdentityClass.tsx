@@ -26,10 +26,10 @@ export const IdentifyClass = () => {
   const { mutate: predictClass, isPending: isPredicting } = usePredictClass();
   const [selectedValues, setSelectedValues] = useState<Record<string, string | number>>({});
   const [modelValues, setModelValues] = useState({
-    form: '',
-    color: '',
-    size: '',
-    venation: ''
+    tempo: '',
+    tonality: '',
+    dynamics: '',
+    spectralDensity: ''
   });
   const [result, setResult] = useState<string[] | null>(null);
   const [activeTab, setActiveTab] = useState<'rules' | 'model'>('rules');
@@ -69,30 +69,30 @@ export const IdentifyClass = () => {
   };
   
   const handleModelSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-  
-    const selectedProperties: SelectedProperty[] = [
-      { name: 'форма', value: modelValues.form },
-      { name: 'цвет', value: modelValues.color },
-      { name: 'размер', value: modelValues.size },
-      { name: 'жилкование', value: modelValues.venation }
-    ]
-    .filter(item => item.value && item.value !== '-- Не выбрано --' && (typeof item.value !== 'number' || !isNaN(item.value)))  // Для числовых значений
-    .map(item => ({ name: item.name, value: item.value }));
-  
-    if (selectedProperties.length === 0) {
-      alert('Заполните хотя бы одно поле');
-      return;
-    }
-  
-    predictClass(selectedProperties, {
-      onSuccess: (data) => {
-        setResult(data.classes);
-        alert('Наиболее подходящие жанры: ' + data.predicted_class);
-      },
-      onError: () => alert('Модель не смогла определить жанр')
-    });
-  };
+		e.preventDefault();
+
+		const selectedProperties: SelectedProperty[] = [
+				{ name: 'tempo', value: modelValues.tempo },
+				{ name: 'tonality', value: modelValues.tonality },
+				{ name: 'dynamics', value: modelValues.dynamics },
+				{ name: 'spectrum', value: modelValues.spectralDensity }
+			]
+			.filter(item => item.value && item.value !== '-- Не выбрано --' && (typeof item.value !== 'number' || !isNaN(item.value)))
+			.map(item => ({ name: item.name, value: item.value }));
+
+			if (selectedProperties.length === 0) {
+				alert('Заполните хотя бы одно поле');
+				return;
+			}
+
+			predictClass(selectedProperties, {
+				onSuccess: (data) => {
+					setResult(data.classes);
+					alert('Наиболее подходящие жанры: ' + data.predicted_class);
+				},
+				onError: () => alert('Модель не смогла определить жанр')
+			});
+	};
   
   
 
@@ -253,140 +253,158 @@ export const IdentifyClass = () => {
                     </form>
                   ) : (
                     <form onSubmit={handleModelSubmit}>
-                      <div className="row g-3">
-                        <div className="col-md-6">
-                          <div className="card h-100 border-primary border-opacity-25">
-                            <div className="card-header bg-blue-10 py-2">
-                              <label className="form-label fw-bold mb-0 text-primary">
-                                Форма листа
-                              </label>
-                            </div>
-                            <div className="card-body">
-                              <select
-                                className="form-select border-primary border-opacity-50"
-                                value={modelValues.form}
-                                onChange={(e) => handleModelValueChange('form', e.target.value)}
-                              >
-                                <option value="">-- Не выбрано --</option>
-                                <option value="Овальная">Овальная</option>
-                                <option value="Ланцетная">Ланцетная</option>
-                                <option value="Сердцевидная">Сердцевидная</option>
-                              </select>
-                            </div>
-                          </div>
-                        </div>
+											<div className="row g-3">
+												<div className="col-md-6">
+													<div className="card h-100 border-primary border-opacity-25">
+														<div className="card-header bg-blue-10 py-2">
+															<label className="form-label fw-bold mb-0 text-primary">
+																Темп (BPM)
+															</label>
+														</div>
+														<div className="card-body">
+															<input
+																type="number"
+																min="1"
+																className="form-control border-primary border-opacity-50"
+																value={modelValues.tempo || ''}
+																onChange={(e) => handleModelValueChange('tempo', e.target.value)}
+																placeholder="Введите темп (целое число)"
+															/>
+														</div>
+													</div>
+												</div>
 
-                        <div className="col-md-6">
-                          <div className="card h-100 border-primary border-opacity-25">
-                            <div className="card-header bg-blue-10 py-2">
-                              <label className="form-label fw-bold mb-0 text-primary">
-                                Цвет листа
-                              </label>
-                            </div>
-                            <div className="card-body">
-                              <select
-                                className="form-select border-primary border-opacity-50"
-                                value={modelValues.color}
-                                onChange={(e) => handleModelValueChange('color', e.target.value)}
-                              >
-                                <option value="">-- Не выбрано --</option>
-                                <option value="Зелёный">Зелёный</option>
-                                <option value="Красный">Красный</option>
-                                <option value="Желтый">Желтый</option>
-                              </select>
-                            </div>
-                          </div>
-                        </div>
+												<div className="col-md-6">
+													<div className="card h-100 border-primary border-opacity-25">
+														<div className="card-header bg-blue-10 py-2">
+															<label className="form-label fw-bold mb-0 text-primary">
+																Тональность
+															</label>
+														</div>
+														<div className="card-body">
+															<select
+																className="form-select border-primary border-opacity-50"
+																value={modelValues.tonality || ''}
+																onChange={(e) => handleModelValueChange('tonality', e.target.value)}
+															>
+																<option value="">-- Не выбрано --</option>
+																<option value="C">C</option>
+																<option value="Am">Am</option>
+																<option value="G">G</option>
+																<option value="Em">Em</option>
+																<option value="D">D</option>
+																<option value="Bm">Bm</option>
+																<option value="A">A</option>
+																<option value="F#m">F#m</option>
+																<option value="E">E</option>
+																<option value="C#m">C#m</option>
+																<option value="B">B</option>
+																<option value="G#m">G#m</option>
+																<option value="F#">F#</option>
+																<option value="D#m">D#m</option>
+																<option value="C#">C#</option>
+																<option value="A#m">A#m</option>
+																<option value="Ab">Ab</option>
+																<option value="Fm">Fm</option>
+																<option value="Eb">Eb</option>
+																<option value="Cm">Cm</option>
+																<option value="Bb">Bb</option>
+																<option value="Gm">Gm</option>
+																<option value="F">F</option>
+																<option value="Dm">Dm</option>
+															</select>
+														</div>
+													</div>
+												</div>
 
-                        <div className="col-md-6">
-                          <div className="card h-100 border-primary border-opacity-25">
-                            <div className="card-header bg-blue-10 py-2">
-                              <label className="form-label fw-bold mb-0 text-primary">
-                                Размер листа (см)
-                              </label>
-                            </div>
-                            <div className="card-body">
-                              <input 
-                                type="number" 
-                                className="form-control border-primary border-opacity-50"
-                                value={modelValues.size}  
-                                onChange={(e) => handleModelValueChange('size', e.target.value)}
-                                placeholder="Введите размер"
-                              />
-                            </div>
-                          </div>
-                        </div>
+												<div className="col-md-6">
+													<div className="card h-100 border-primary border-opacity-25">
+														<div className="card-header bg-blue-10 py-2">
+															<label className="form-label fw-bold mb-0 text-primary">
+																Динамика
+															</label>
+														</div>
+														<div className="card-body">
+															<input
+																type="number"
+																min="1"
+																className="form-control border-primary border-opacity-50"
+																value={modelValues.dynamics || ''}
+																onChange={(e) => handleModelValueChange('dynamics', e.target.value)}
+																placeholder="Введите значение динамики"
+															/>
+														</div>
+													</div>
+												</div>
 
-                        <div className="col-md-6">
-                          <div className="card h-100 border-primary border-opacity-25">
-                            <div className="card-header bg-blue-10 py-2">
-                              <label className="form-label fw-bold mb-0 text-primary">
-                                Тип жилкования
-                              </label>
-                            </div>
-                            <div className="card-body">
-                              <select
-                                className="form-select border-primary border-opacity-50"
-                                value={modelValues.venation}
-                                onChange={(e) => handleModelValueChange('venation', e.target.value)}
-                              >
-                                <option value="">-- Не выбрано --</option>
-                                <option value="Параллельное">Параллельное</option>
-                                <option value="Сетчатое">Сетчатое</option>
-                                <option value="Дуговидное">Дуговидное</option>
-                              </select>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+												<div className="col-md-6">
+													<div className="card h-100 border-primary border-opacity-25">
+														<div className="card-header bg-blue-10 py-2">
+															<label className="form-label fw-bold mb-0 text-primary">
+																Плотность спектра
+															</label>
+														</div>
+														<div className="card-body">
+															<input
+																type="number"
+																min="1"
+																className="form-control border-primary border-opacity-50"
+																value={modelValues.spectralDensity || ''}
+																onChange={(e) => handleModelValueChange('spectralDensity', e.target.value)}
+																placeholder="Введите плотность спектра"
+															/>
+														</div>
+													</div>
+												</div>
+											</div>
 
-                      <div className="mt-4">
-                        <h5 className="text-primary mb-3">
-                          <i className="bi bi-card-checklist me-2"></i>
-                          Введенные параметры
-                        </h5>
-                        <div className="row g-2">
-                          {Object.entries(modelValues)
-                            .filter(([_, value]) => value !== '')
-                            .map(([name, value]) => (
-                              <div key={name} className="col-md-6">
-                                <div className="d-flex align-items-center p-2 bg-blue-10 rounded">
-                                  <span className="badge bg-primary me-2">{name}</span>
-                                  <span className="text-truncate">{value}</span>
-                                </div>
-                              </div>
-                            ))}
-                          {Object.values(modelValues).filter(v => v !== '').length === 0 && (
-                            <div className="col-12">
-                              <div className="alert alert-info mb-0">
-                                <i className="bi bi-info-circle me-2"></i>
-                                Параметры не введены
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+											<div className="mt-4">
+												<h5 className="text-primary mb-3">
+													<i className="bi bi-card-checklist me-2"></i>
+													Введенные параметры
+												</h5>
+												<div className="row g-2">
+													{Object.entries(modelValues)
+														.filter(([_, value]) => value !== '')
+														.map(([name, value]) => (
+															<div key={name} className="col-md-6">
+																<div className="d-flex align-items-center p-2 bg-blue-10 rounded">
+																	<span className="badge bg-primary me-2">{name}</span>
+																	<span className="text-truncate">{value}</span>
+																</div>
+															</div>
+														))}
+													{Object.values(modelValues).filter(v => v !== '').length === 0 && (
+														<div className="col-12">
+															<div className="alert alert-info mb-0">
+																<i className="bi bi-info-circle me-2"></i>
+																Параметры не введены
+															</div>
+														</div>
+													)}
+												</div>
+											</div>
 
-                      <div className="d-grid mt-4">
-                        <button
-                          type="submit"
-                          className="btn btn-primary btn-lg"
-                          disabled={isPredicting || Object.values(modelValues).filter(v => v !== '').length === 0}
-                        >
-                          {isPredicting ? (
-                            <>
-                              <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                              Прогнозирование...
-                            </>
-                          ) : (
-                            <>
-                              <i className="bi bi-cpu me-2"></i>
-                              Запустить модель
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </form>
+											<div className="d-grid mt-4">
+												<button
+													type="submit"
+													className="btn btn-primary btn-lg"
+													disabled={isPredicting || Object.values(modelValues).filter(v => v !== '').length === 0}
+												>
+													{isPredicting ? (
+														<>
+															<span className="spinner-border spinner-border-sm me-2" role="status"></span>
+															Прогнозирование...
+														</>
+													) : (
+														<>
+															<i className="bi bi-cpu me-2"></i>
+															Запустить модель
+														</>
+													)}
+												</button>
+											</div>
+										</form>
                   )}
                 </div>
 
@@ -431,7 +449,3 @@ export const IdentifyClass = () => {
     </div>
   );
 };
-
-// Добавьте в ваш CSS:
-// .bg-blue-10 { background-color: rgba(13, 110, 253, 0.1); }
-// .bg-blue-80 { background-color: rgba(13, 110, 253, 0.8); }
