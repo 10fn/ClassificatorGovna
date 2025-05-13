@@ -8,6 +8,11 @@ import {
 } from '../IdentityClass/api';
 import { useMutation } from '@tanstack/react-query';
 
+interface ProcessStep {
+  propName: string;
+  classes: string[];
+}
+
 const usePredictClass = () => {
   return useMutation({
     mutationFn: async (properties: SelectedProperty[]) => {
@@ -26,17 +31,17 @@ export const IdentifyClass = () => {
   const { mutate: predictClass, isPending: isPredicting } = usePredictClass();
   const [selectedValues, setSelectedValues] = useState<Record<string, string | number>>({});
   const [modelValues, setModelValues] = useState({
-    form: '',
-    color: '',
-    size: '',
-    venation: ''
+    color: '',  // 'цвет'
+    size: '',   // 'размер'
+    shape: '',  // 'форма'
+    veining: '' // 'жилкование'
   });
-  const [result, setResult] = useState<string[] | null>(null);
+  const [processSteps, setProcessSteps] = useState<ProcessStep[]>([]);
+  const [finalResult, setFinalResult] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<'rules' | 'model'>('rules');
 
   const handleValueChange = (propertyName: string, value: string | number) => {
     if (value === '') {
-      // Удаляем свойство из состояния, если выбрано пустое значение
       setSelectedValues(prev => {
         const newValues = {...prev};
         delete newValues[propertyName];
@@ -48,15 +53,15 @@ export const IdentifyClass = () => {
         [propertyName]: value
       }));
     }
-    setResult(null);
+    setProcessSteps([]);
+    setFinalResult([]);
   };
 
-  const handleModelValueChange = (field: keyof typeof modelValues, value: string) => {
-    setModelValues(prev => ({
-      ...prev,
+  const handleModelValueChange = (field: string, value: string) => {
+    setModelValues(prevState => ({
+      ...prevState,
       [field]: value
     }));
-    setResult(null);
   };
 
   const handleRulesSubmit = (e: React.FormEvent) => {
@@ -72,34 +77,46 @@ export const IdentifyClass = () => {
     }
 
     identifyClass(selectedProperties, {
-      onSuccess: (data) => setResult(data.classes),
+      onSuccess: (data) => {
+        setProcessSteps(data.process);
+        setFinalResult(data.result);
+      },
       onError: () => alert('Ошибка при идентификации')
     });
   };
 
   const handleModelSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+  
+    // Переводим на русском языке
+    const propertyNames: { [key: string]: string } = {
+      color: 'цвет',
+      size: 'размер',
+      shape: 'форма',
+      veining: 'жилкование'
+    };
+  
     const selectedProperties: SelectedProperty[] = [
-      { name: 'форма', value: modelValues.form },
-      { name: 'цвет', value: modelValues.color },
-      { name: 'размер', value: modelValues.size },
-      { name: 'жилкование', value: modelValues.venation }
+      { name: propertyNames.color, value: modelValues.color }, 
+      { name: propertyNames.size, value: modelValues.size },   
+      { name: propertyNames.shape, value: modelValues.shape },  
+      { name: propertyNames.veining, value: modelValues.veining } 
     ].filter(item => item.value !== '');
-
+  
     if (selectedProperties.length === 0) {
       alert('Заполните хотя бы одно поле');
       return;
     }
-
+  
     predictClass(selectedProperties, {
       onSuccess: (data) => {
-        setResult(data.classes)
-        alert('Наиболее подходящие классы: ' + data.predicted_class)
+        setFinalResult([data.predicted_class]);
+        alert('Наиболее подходящая модель растения: ' + data.predicted_class);
       },
-      onError: () => alert('Модель не смогла определить класс')
+      onError: () => alert('ИИ не смог определить модель растения')
     });
   };
+  
 
   if (isLoading) {
     return (
@@ -124,41 +141,44 @@ export const IdentifyClass = () => {
 
   return (
     <div className="container my-4">
-      <div className="card border-success shadow">
+      <div className="card border-success shadow-lg" style={{borderWidth: '2px'}}>
         <div className="card-header bg-success text-white">
           <h2 className="h5 mb-0">Идентификация класса растения</h2>
         </div>
-        
+  
         <div className="card-body">
-          <ul className="nav nav-tabs mb-4">
+          <ul className="nav nav-pills mb-4 nav-fill">
             <li className="nav-item">
               <button 
-                className={`nav-link ${activeTab === 'rules' ? 'active' : ''}`}
+                className={`nav-link ${activeTab === 'rules' ? 'active bg-success border-success' : 'text-success'}`}
                 onClick={() => setActiveTab('rules')}
               >
+                <i className="bi bi-journal-bookmark me-2"></i>
                 По правилам
               </button>
             </li>
             <li className="nav-item">
               <button 
-                className={`nav-link ${activeTab === 'model' ? 'active' : ''}`}
+                className={`nav-link ${activeTab === 'model' ? 'active bg-success border-success' : 'text-success'}`}
                 onClick={() => setActiveTab('model')}
               >
-                Через модель
+                <i className="bi bi-robot me-2"></i>
+                Через ИИ модель
               </button>
             </li>
           </ul>
-
+  
           {activeTab === 'rules' ? (
             <form onSubmit={handleRulesSubmit}>
               {properties.map((property: PropertyWithValues) => (
                 <div key={property.name} className="mb-4">
-                  <label className="form-label"><strong>{property.name}</strong></label>
-                  
+                  <label className="form-label fw-bold text-success">{property.name}</label>
+  
                   {property.type === 'numeric' ? (
                     <input
                       type="number"
                       className="form-control form-control-lg border-success"
+                      style={{borderWidth: '2px'}}
                       value={selectedValues[property.name] || ''}
                       onChange={(e) => handleValueChange(property.name, e.target.value === '' ? '' : Number(e.target.value))}
                       placeholder={`Введите значение для ${property.name}`}
@@ -166,6 +186,7 @@ export const IdentifyClass = () => {
                   ) : (
                     <select
                       className="form-select border-success"
+                      style={{borderWidth: '2px'}}
                       value={selectedValues[property.name] || ''}
                       onChange={(e) => handleValueChange(property.name, e.target.value)}
                     >
@@ -179,26 +200,36 @@ export const IdentifyClass = () => {
                   )}
                 </div>
               ))}
-
+  
               <div className="mt-4">
-                <h5 className="mb-3">Выбранные значения:</h5>
+                <h5 className="mb-3 text-success">
+                  <i className="bi bi-list-check me-2"></i>
+                  Выбранные значения:
+                </h5>
                 <div className="list-group">
                   {Object.entries(selectedValues)
                     .filter(([_, value]) => value !== '' && value !== undefined)
                     .map(([name, value]) => (
-                      <div key={name} className="list-group-item d-flex justify-content-between align-items-center">
+                      <div key={name} className="list-group-item d-flex justify-content-between align-items-center border-success">
                         <span><strong>{name}</strong>: {value}</span>
+                        <button 
+                          type="button" 
+                          className="btn btn-sm btn-outline-success"
+                          onClick={() => handleValueChange(name, '')}
+                        >
+                          <i className="bi bi-x"></i>
+                        </button>
                       </div>
                     ))}
                   {Object.values(selectedValues).filter(v => v !== '' && v !== undefined).length === 0 && (
-                    <div className="list-group-item">Не выбрано ни одного свойства</div>
+                    <div className="list-group-item text-success">Не выбрано ни одного свойства</div>
                   )}
                 </div>
               </div>
-
+  
               <button
                 type="submit"
-                className="btn btn-success btn-lg mt-4"
+                className="btn btn-success btn-lg mt-4 w-100"
                 disabled={isIdentifying || Object.values(selectedValues).filter(v => v !== '' && v !== undefined).length === 0}
               >
                 {isIdentifying ? (
@@ -216,99 +247,148 @@ export const IdentifyClass = () => {
             </form>
           ) : (
             <form onSubmit={handleModelSubmit}>
-              <div className="mb-4">
-                <label className="form-label"><strong>Форма листа</strong></label>
-                <select
-                  className="form-select border-success"
-                  value={modelValues.form}
-                  onChange={(e) => handleModelValueChange('form', e.target.value)}
-                >
-                  <option value="">-- Выберите форму --</option>
-                  <option value="Овальная">Овальная</option>
-                  <option value="Ланцетная">Ланцетная</option>
-                  <option value="Сердцевидная">Сердцевидная</option>
-                </select>
-              </div>
-
-              <div className="mb-4">
-                <label className="form-label"><strong>Цвет листа</strong></label>
-                <select
-                  className="form-select border-success"
-                  value={modelValues.color}
-                  onChange={(e) => handleModelValueChange('color', e.target.value)}
-                >
-                  <option value="">-- Выберите цвет --</option>
-                  <option value="Зелёный">Зелёный</option>
-                  <option value="Красный">Красный</option>
-                  <option value="Желтый">Желтый</option>
-                </select>
-              </div>
-
-              <div className="mb-4">
-                <label className="form-label"><strong>Размер листа (см)</strong></label>
-                <input 
-                  type="number" 
-                  className="form-control border-success"
-                  value={modelValues.size}  
-                  onChange={(e) => handleModelValueChange('size', e.target.value)}
-                  placeholder="Введите размер"
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="form-label"><strong>Тип жилкования</strong></label>
-                <select
-                  className="form-select border-success"
-                  value={modelValues.venation}
-                  onChange={(e) => handleModelValueChange('venation', e.target.value)}
-                >
-                  <option value="">-- Выберите жилкование --</option>
-                  <option value="Параллельное">Параллельное</option>
-                  <option value="Сетчатое">Сетчатое</option>
-                  <option value="Дуговидное">Дуговидное</option>
-                </select>
-              </div>
-
-              <div className="mt-4">
-                <h5 className="mb-3">Выбранные значения:</h5>
-                <div className="list-group">
-                  {Object.entries(modelValues)
-                    .filter(([_, value]) => value !== '')
-                    .map(([name, value]) => (
-                      <div key={name} className="list-group-item d-flex justify-content-between align-items-center">
-                        <span><strong>{name}</strong>: {value}</span>
-                      </div>
-                    ))}
-                  {Object.values(modelValues).filter(v => v !== '').length === 0 && (
-                    <div className="list-group-item">Не заполнено ни одного поля</div>
-                  )}
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                className="btn btn-success btn-lg mt-4"
-                disabled={isPredicting || Object.values(modelValues).filter(v => v !== '').length === 0}
+            <div className="mb-4">
+              <label className="form-label fw-bold text-success">Цвет</label>
+              <select
+                className="form-select border-success"
+                style={{borderWidth: '2px'}}
+                value={modelValues.color}
+                onChange={(e) => handleModelValueChange('color', e.target.value)}
               >
-                {isPredicting ? (
-                  <>
-                    <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                    Прогнозирование...
-                  </>
-                ) : (
-                  <>
-                    <i className="bi bi-robot me-2"></i>
-                    Определить моделью
-                  </>
-                )}
-              </button>
-            </form>
+                <option value="">-- Выберите цвет --</option>
+                <option value="Зелёный">Зелёный</option>
+              </select>
+            </div>
+          
+            <div className="mb-4">
+              <label className="form-label fw-bold text-success">Размер</label>
+              <input
+                type="number"
+                className="form-control border-success"
+                style={{borderWidth: '2px'}}
+                value={modelValues.size}
+                onChange={(e) => handleModelValueChange('size', e.target.value)}
+                placeholder="Введите размер"
+                min={5} // Минимальное значение для размера
+                max={40} // Максимальное значение для размера
+              />
+            </div>
+          
+            <div className="mb-4">
+              <label className="form-label fw-bold text-success">Форма</label>
+              <select
+                className="form-select border-success"
+                style={{borderWidth: '2px'}}
+                value={modelValues.shape}
+                onChange={(e) => handleModelValueChange('shape', e.target.value)}
+              >
+                <option value="">-- Выберите форму --</option>
+                <option value="Лопатчатая">Лопатчатая</option>
+                <option value="Пальчатая">Пальчатая</option>
+                <option value="Ланцетная">Ланцетная</option>
+              </select>
+            </div>
+          
+            <div className="mb-4">
+              <label className="form-label fw-bold text-success">Жилкование</label>
+              <select
+                className="form-select border-success"
+                style={{borderWidth: '2px'}}
+                value={modelValues.veining}
+                onChange={(e) => handleModelValueChange('veining', e.target.value)}
+              >
+                <option value="">-- Выберите жилкование --</option>
+                <option value="Сетчатое">Сетчатое</option>
+                <option value="Параллельное">Параллельное</option>
+                <option value="Пальчатое">Пальчатое</option>
+              </select>
+            </div>
+          
+            <button
+              type="submit"
+              className="btn btn-success btn-lg mt-4 w-100"
+              disabled={isPredicting || Object.values(modelValues).filter(v => v !== '').length === 0}
+            >
+              {isPredicting ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                  Прогнозирование...
+                </>
+              ) : (
+                <>
+                  <i className="bi bi-magic me-2"></i>
+                  Определить модель
+                </>
+              )}
+            </button>
+          </form>          
           )}
+  
+          {processSteps && (processSteps.length > 0 || finalResult.length > 0) && (
+            <div className="mt-4">
+              <h5 className="text-success mb-3">
+                <i className="bi bi-diagram-3 me-2"></i>
+                Процесс идентификации:
+              </h5>
+              
+              {processSteps.length > 0 && (
+                <div className="table-responsive mb-4">
+                  <table className="table table-bordered table-hover">
+                    <thead className="table-success">
+                      <tr>
+                        <th>Шаг</th>
+                        <th>Опровергнутые модели</th>
+                        <th>Причины</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {processSteps.map((step, index) => (
+                        <tr key={index}>
+                          <td>{index + 1}</td>
+                          <td>
+                            {step.classes.length > 0 ? (
+                              step.classes.join(', ')
+                            ) : (
+                              <span className="text-muted">Не исключено ни одного класса</span>
+                            )}
+                          </td>
+                          <td>{step.propName}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
 
-          {result && (
-            <div className="alert alert-success mt-4">
-              <i className="bi bi-check-circle-fill me-2"></i>
-              <strong>Результат идентификации:</strong> {result.join(', ')}
+              {finalResult.length > 0 && (
+                <div className={`alert ${finalResult.length === 1 ? 'alert-success' : 'alert-info'}`}>
+                  <h5 className="alert-heading">
+                    <i className="bi bi-check-circle me-2"></i>
+                    Результат идентификации:
+                  </h5>
+                  <p className="mb-0">
+                    {finalResult.length === 1 ? (
+                      <>
+                        <strong>Определенная модель растения:</strong> {finalResult[0]}
+                      </>
+                    ) : (
+                      <>
+                        <strong>Возможные модели:</strong> {finalResult.join(', ')}
+                      </>
+                    )}
+                  </p>
+                </div>
+              )}
+
+              {finalResult.length === 0 && processSteps.length > 0 && (
+                <div className="alert alert-warning">
+                  <h5 className="alert-heading">
+                    <i className="bi bi-exclamation-triangle me-2"></i>
+                    Результат идентификации:
+                  </h5>
+                  <p className="mb-0">Не удалось определить модель растения по заданным свойствам</p>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -14,8 +14,8 @@ function KnowledgeBaseEditor() {
     { label: 'Виды растений', path: '/species' },
     { label: 'Свойства', path: '/properties' },
     { label: 'Возможные значения', path: '/possible-values' },
-    { label: 'Активация свойств', path: '/property-descriptions' },
-    { label: 'Активация значений', path: '/property-values' },
+    { label: 'Описание свойств вида', path: '/property-descriptions' },
+    { label: 'Значение свойств вида', path: '/property-values' },
     { label: 'Проверка полноты знаний', path: '/completeness-check' },
     { label: 'Определить класс', path: '/identify' },
 
